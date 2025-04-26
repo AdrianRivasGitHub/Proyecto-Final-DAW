@@ -1,0 +1,22 @@
+# Entorno virtual
+venv/
+
+# Variables de entorno
+.env
+
+# Archivos de cache y compilados
+__pycache__/
+*.pyc
+*.pyo
+
+# Archivos de log
+*.log
+
+# Base de datos SQLite
+*.sqlite3
+
+# Archivos de VSCode
+.vscode/
+
+#archivos varios
+estructura_bbdd.txt

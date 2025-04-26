@@ -1,0 +1,7 @@
+Flask
+Flask-Cors
+Flask-SQLAlchemy
+Flask-Migrate         # Extensión de Alembic
+Flask-JWT-Extended    # Para autenticación JWT
+python-dotenv         # Para variables de entorno (.env)
+psycopg2-binary       # Cliente PostgreSQL
