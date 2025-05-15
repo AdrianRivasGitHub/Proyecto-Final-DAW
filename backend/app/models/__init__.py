@@ -3,3 +3,12 @@ from .roles import Rol
 from .recetas import Receta
 from .categorias import Categoria
 from .regiones import Region
+from .ingredientes import Ingrediente
+from .alergenos import Alergeno
+from .subcategorias import Subcategoria
+from .receta_ingrediente import RecetaIngrediente
+from .receta_subcategoria import RecetaSubcategoria
+from .receta_alergeno import RecetaAlergeno
+from .favoritos import Favorito
+from .planificaciones import Planificacion
+from .planificacion_receta import PlanificacionReceta

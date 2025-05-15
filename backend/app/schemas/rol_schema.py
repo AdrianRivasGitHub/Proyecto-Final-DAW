@@ -7,4 +7,5 @@ class RolSchema(ma.SQLAlchemySchema):
         load_instance = True
 
     id_rol = ma.auto_field()
-    nombre_rol = ma.auto_field()
+    nombre_rol = ma.auto_field(required=True)
+    descripcion = ma.auto_field()

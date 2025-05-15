@@ -7,4 +7,4 @@ class CategoriaSchema(ma.SQLAlchemySchema):
         load_instance = True
 
     id_categoria = ma.auto_field()
-    nombre = ma.auto_field()
+    nombre = ma.auto_field(required=True)
