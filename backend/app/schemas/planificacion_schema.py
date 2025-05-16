@@ -13,5 +13,8 @@ class PlanificacionSchema(ma.SQLAlchemySchema):
     nombre = ma.auto_field(required=True)
     fecha_inicio = ma.auto_field(required=True)
     fecha_fin = ma.auto_field(required=True)
+    created_at = fields.DateTime(dump_only=True)
+    updated_at = fields.DateTime(dump_only=True)
+
 
     usuario = fields.Nested('UsuarioSchema', only=['nombre', 'correo'])

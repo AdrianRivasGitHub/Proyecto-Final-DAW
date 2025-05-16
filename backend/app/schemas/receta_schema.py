@@ -16,8 +16,8 @@ class RecetaSchema(ma.SQLAlchemySchema):
     categoria_id = ma.auto_field(required=True)
     region_id = ma.auto_field(required=True)
     usuario_id = ma.auto_field(required=True)
-    created_at = ma.auto_field()
-    updated_at = ma.auto_field()
+    created_at = fields.DateTime(dump_only=True)
+    updated_at = fields.DateTime(dump_only=True)
 
     #Mostrar los nombres de las relaciones en lugar de los IDs:
     categoria = fields.Nested('CategoriaSchema', only=['nombre'])

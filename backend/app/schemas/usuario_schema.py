@@ -13,5 +13,7 @@ class UsuarioSchema(ma.SQLAlchemySchema):
     contraseña = ma.auto_field(required=True)
     #contraseña = ma.Str(required=True, load_only=True)
     rol_id = ma.auto_field(required=True)
+    created_at = fields.DateTime(dump_only=True)
+    updated_at = fields.DateTime(dump_only=True)
 
     rol = fields.Nested('RolSchema', only=['nombre_rol'])

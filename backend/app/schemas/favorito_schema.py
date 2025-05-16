@@ -11,6 +11,7 @@ class FavoritoSchema(ma.SQLAlchemySchema):
     id_favorito = ma.auto_field()
     usuario_id = ma.auto_field(required=True)
     receta_id = ma.auto_field(required=True)
+    created_at = fields.DateTime(dump_only=True)
 
     receta = fields.Nested('RecetaSchema', only=['nombre', 'imagen_url', 'categoria'])
     usuario = fields.Nested('UsuarioSchema', only=['nombre', 'correo'])
