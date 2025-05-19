@@ -7,4 +7,4 @@ class RegionSchema(ma.SQLAlchemySchema):
         load_instance = True
 
     id_region = ma.auto_field()
-    nombre = ma.auto_field(required=True)
+    nombre = ma.auto_field()

@@ -7,7 +7,7 @@ class UsuarioSchema(ma.SQLAlchemySchema):
         model = Usuario
         load_instance = True  #Permite cargar directamente a un objeto Usuario
 
-    id_usuario = ma.auto_field()
+    id_usuario = ma.auto_field(dump_only=True)
     nombre = ma.auto_field(required=True)
     correo = ma.auto_field(required=True)
     contraseña = ma.auto_field(required=True)

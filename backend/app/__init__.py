@@ -28,10 +28,31 @@ def create_app():
     CORS(app)
 
     #Registro de rutas
-    from app.routes.usuarios import usuarios_bp
-    app.register_blueprint(usuarios_bp, url_prefix="/api/usuarios")
-    
-    from app.routes.recetas import recetas_bp
+    from app.routes.alergenos_routes import alergenos_bp
+    app.register_blueprint(alergenos_bp, url_prefix="/api/alergenos")
+
+    from app.routes.categorias_routes import categorias_bp
+    app.register_blueprint(categorias_bp, url_prefix="/api/categorias")
+
+    from app.routes.favoritos_routes import favoritos_bp
+    app.register_blueprint(favoritos_bp, url_prefix="/api/favoritos")
+
+    from app.routes.ingredientes_routes import ingredientes_bp
+    app.register_blueprint(ingredientes_bp, url_prefix="/api/ingredientes")
+
+    from app.routes.planificaciones_routes import planificaciones_bp
+    app.register_blueprint(planificaciones_bp, url_prefix='/api/planificaciones')
+
+    from app.routes.recetas_routes import recetas_bp
     app.register_blueprint(recetas_bp, url_prefix="/api/recetas")
+
+    from app.routes.regiones_routes import regiones_bp
+    app.register_blueprint(regiones_bp, url_prefix="/api/regiones")
+
+    from app.routes.subcategorias_routes import subcategorias_bp
+    app.register_blueprint(subcategorias_bp, url_prefix="/api/subcategorias")
+
+    from app.routes.usuarios_routes import usuarios_bp
+    app.register_blueprint(usuarios_bp, url_prefix="/api/usuarios")
 
     return app

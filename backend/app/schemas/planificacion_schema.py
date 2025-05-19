@@ -16,5 +16,5 @@ class PlanificacionSchema(ma.SQLAlchemySchema):
     created_at = fields.DateTime(dump_only=True)
     updated_at = fields.DateTime(dump_only=True)
 
-
     usuario = fields.Nested('UsuarioSchema', only=['nombre', 'correo'])
+    recetas_planificadas = fields.Nested('PlanificacionRecetaSchema', many=True)

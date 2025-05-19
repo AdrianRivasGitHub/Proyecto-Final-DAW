@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify
+from flask import Blueprint
 from app.controllers.receta_controller import (
     obtener_recetas_controller,
     obtener_receta_por_id_controller,
@@ -21,6 +21,7 @@ def obtener_recetas_route():
 def obtener_receta_por_id_route(id_receta):
     return obtener_receta_por_id_controller(id_receta)
 
+# Listar recetas por categoría o región
 @recetas_bp.route('/categoria/<int:categoria_id>', methods=['GET'])
 def recetas_por_categoria_route(categoria_id):
     return listar_recetas_por_categoria_controller(categoria_id)
@@ -31,7 +32,7 @@ def recetas_por_region_route(region_id):
 
 # Crear receta
 @recetas_bp.route('/', methods=['POST'])
-def crear_receta():
+def crear_receta_route():
     return crear_receta_controller()
 
 @recetas_bp.route('/<int:id_receta>', methods=['PUT'])

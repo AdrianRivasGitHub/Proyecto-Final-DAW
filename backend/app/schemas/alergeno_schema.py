@@ -7,5 +7,5 @@ class AlergenoSchema(ma.SQLAlchemySchema):
         load_instance = True
 
     id_alergeno = ma.auto_field()
-    nombre = ma.auto_field(required=True)
+    nombre = ma.auto_field()
     descripcion = ma.auto_field()

@@ -16,3 +16,4 @@ class RecetaIngredienteSchema(ma.SQLAlchemySchema):
 
     ingrediente = fields.Nested('IngredienteSchema', only=['nombre'])
     receta = fields.Nested('RecetaSchema', only=['nombre'])
+    

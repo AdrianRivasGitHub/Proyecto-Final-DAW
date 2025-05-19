@@ -17,3 +17,4 @@ class PlanificacionRecetaSchema(ma.SQLAlchemySchema):
     receta = fields.Nested('RecetaSchema', only=['nombre', 'imagen_url'])
     categoria = fields.Nested('CategoriaSchema', only=['nombre'])
     planificacion = fields.Nested('PlanificacionSchema', only=['nombre'])
+    

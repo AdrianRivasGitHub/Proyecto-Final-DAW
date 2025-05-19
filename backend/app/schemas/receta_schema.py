@@ -8,7 +8,7 @@ class RecetaSchema(ma.SQLAlchemySchema):
         load_instance = True
         include_fk = True  #Para incluir las claves foráneas en el schema
 
-    id_receta = ma.auto_field()
+    id_receta = ma.auto_field(dump_only=True)
     nombre = ma.auto_field(required=True)
     descripcion = ma.auto_field()
     preparacion = ma.auto_field()

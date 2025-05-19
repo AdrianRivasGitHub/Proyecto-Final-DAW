@@ -6,6 +6,6 @@ class SubcategoriaSchema(ma.SQLAlchemySchema):
         model = Subcategoria
         load_instance = True
 
-    id_subcategoria = ma.auto_field()
+    id_subcategoria = ma.auto_field(dump_only=True)
     nombre = ma.auto_field(required=True)
     descripcion = ma.auto_field()
