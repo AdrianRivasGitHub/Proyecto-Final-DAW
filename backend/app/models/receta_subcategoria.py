@@ -8,8 +8,8 @@ class RecetaSubcategoria(db.Model):
     subcategoria_id = db.Column(db.Integer, db.ForeignKey('subcategorias.id_subcategoria'), nullable=False)
 
     # Relaciones
-    receta = db.relationship('Receta', backref='subcategorias_receta')
-    subcategoria = db.relationship('Subcategoria', backref='recetas_subcategoria')
+    receta = db.relationship('Receta', backref=db.backref('subcategorias_receta', cascade='all, delete-orphan'))
+    subcategoria = db.relationship('Subcategoria', backref=db.backref('recetas_subcategoria', cascade='all, delete-orphan'))
 
     __table_args__ = (
         db.UniqueConstraint('receta_id', 'subcategoria_id', name='uq_receta_subcategoria'),

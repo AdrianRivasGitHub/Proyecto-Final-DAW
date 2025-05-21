@@ -19,7 +19,12 @@ class RecetaSchema(ma.SQLAlchemySchema):
     created_at = fields.DateTime(dump_only=True)
     updated_at = fields.DateTime(dump_only=True)
 
-    #Mostrar los nombres de las relaciones en lugar de los IDs:
+    # Mostrar los nombres de las relaciones en lugar de los IDs:
     categoria = fields.Nested('CategoriaSchema', only=['nombre'])
     region = fields.Nested('RegionSchema', only=['nombre'])
     usuario = fields.Nested('UsuarioSchema', only=['nombre', 'correo'])
+
+    # Listados de ingredientes, alérgenos y subcategorías asociados a la receta
+    ingredientes_receta = fields.Nested('RecetaIngredienteSchema', many=True, dump_only=True)
+    alergenos_receta = fields.Nested('RecetaAlergenoSchema', many=True, dump_only=True)
+    subcategorias_receta = fields.Nested('RecetaSubcategoriaSchema', many=True, dump_only=True)

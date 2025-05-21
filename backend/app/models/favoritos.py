@@ -10,8 +10,8 @@ class Favorito(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.now(timezone.utc))
 
     # Relaciones
-    usuario = db.relationship('Usuario', backref='favoritos')
-    receta = db.relationship('Receta', backref='favoritos')
+    usuario = db.relationship('Usuario', backref=db.backref('favoritos', cascade='all, delete-orphan'))
+    receta = db.relationship('Receta', backref=db.backref('favoritos', cascade='all, delete-orphan'))
 
     __table_args__ = (
         db.UniqueConstraint('usuario_id', 'receta_id', name='uq_usuario_receta_favorito'),

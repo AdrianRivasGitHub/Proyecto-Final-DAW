@@ -10,8 +10,8 @@ class RecetaIngrediente(db.Model):
     unidad = db.Column(db.String(50), nullable=False)
 
     # Relaciones
-    receta = db.relationship('Receta', backref='ingredientes_receta')
-    ingrediente = db.relationship('Ingrediente', backref='recetas_ingrediente')
+    receta = db.relationship('Receta', backref=db.backref('ingredientes_receta', cascade='all, delete-orphan'))
+    ingrediente = db.relationship('Ingrediente', backref=db.backref('recetas_ingrediente', cascade='all, delete-orphan'))
 
     __table_args__ = (
         db.UniqueConstraint('receta_id', 'ingrediente_id', name='uq_receta_ingrediente'),

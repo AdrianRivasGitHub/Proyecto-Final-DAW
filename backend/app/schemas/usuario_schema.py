@@ -10,8 +10,7 @@ class UsuarioSchema(ma.SQLAlchemySchema):
     id_usuario = ma.auto_field(dump_only=True)
     nombre = ma.auto_field(required=True)
     correo = ma.auto_field(required=True)
-    contraseña = ma.auto_field(required=True)
-    #contraseña = ma.Str(required=True, load_only=True)
+    contraseña = ma.Str(required=True, load_only=True) # No volcar la contraseña
     rol_id = ma.auto_field(required=True)
     created_at = fields.DateTime(dump_only=True)
     updated_at = fields.DateTime(dump_only=True)

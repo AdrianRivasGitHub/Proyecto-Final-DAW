@@ -51,8 +51,20 @@ def crear_receta_controller():
 
     if errores:
         return jsonify(errores), 400
+    
+    # Validamos que venga el array de ingrediente por lo menos
+    ingredientes = data.get('ingredientes')
+    if not ingredientes or not isinstance(ingredientes, list):
+        return jsonify({"Error": "Debe enviar una lista de ingredientes para la receta"}), 400    
 
-    nueva_receta = crear_receta(data)
+    # Creamos la receta con ingredientes, alergenos y subcategorias
+    try:
+        nueva_receta = crear_receta(data)
+    except ValueError as ve:
+        return jsonify({"Error": str(ve)}), 400
+    except Exception as e:
+        return jsonify({"Error": str(e)}), 500
+    
     resultado = receta_schema.dump(nueva_receta)
     return jsonify(resultado), 201
 
@@ -63,7 +75,13 @@ def actualizar_receta_controller(id_receta):
     if errores:
         return jsonify(errores), 400
     
-    receta_actualizada = actualizar_receta(id_receta, data)
+    try:
+        receta_actualizada = actualizar_receta(id_receta, data)
+    except ValueError as ve:
+        return jsonify({"Error": str(ve)}), 400
+    except Exception as e:
+        return jsonify({"Error": str(e)}), 500    
+
     if not receta_actualizada:
         return jsonify({'Error': 'Receta no encontrada'}), 404
     return jsonify(receta_schema.dump(receta_actualizada)), 200

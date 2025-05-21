@@ -13,4 +13,4 @@ class Planificacion(db.Model):
     updated_at = db.Column(db.DateTime, default=datetime.now(timezone.utc), onupdate=datetime.now(timezone.utc))
 
     # Relaciones
-    usuario = db.relationship('Usuario', backref='planificaciones')
+    usuario = db.relationship('Usuario', backref=db.backref('planificaciones', cascade='all, delete-orphan'))

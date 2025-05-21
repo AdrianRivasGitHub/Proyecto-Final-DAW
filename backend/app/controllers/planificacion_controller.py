@@ -14,6 +14,7 @@ planificaciones_schema = PlanificacionSchema(many=True)
 def crear_planificacion_controller():
     data = request.get_json()
     errores = planificacion_schema.validate(data)
+    
     if errores:
         return jsonify(errores), 400
 
@@ -22,9 +23,11 @@ def crear_planificacion_controller():
     if not recetas or not isinstance(recetas, list):
         return jsonify({"Error": "Debe enviar un array de recetas para la planificación"}), 400
     
-     # Creamos la planificación con recetas incluidas
+    # Creamos la planificación con recetas incluidas
     try:
         nueva_planificacion = crear_planificacion(data)
+    except ValueError as ve:
+        return jsonify({"Error": str(ve)}), 400
     except Exception as e:
         return jsonify({"Error": str(e)}), 500
     
@@ -51,7 +54,13 @@ def actualizar_planificacion_controller(id_planificacion):
     if errores:
         return jsonify(errores), 400
 
-    planificacion_actualizada = actualizar_planificacion(id_planificacion, data)
+    try:
+        planificacion_actualizada = actualizar_planificacion(id_planificacion, data)
+    except ValueError as ve:
+        return jsonify({"Error": str(ve)}), 400
+    except Exception as e:
+        return jsonify({"Error": str(e)}), 500
+    
     if not planificacion_actualizada:
         return jsonify({"Error": "Planificación no encontrada"}), 404
     return jsonify(planificacion_schema.dump(planificacion_actualizada)), 200

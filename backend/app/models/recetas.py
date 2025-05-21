@@ -9,9 +9,9 @@ class Receta(db.Model):
     descripcion = db.Column(db.Text)
     preparacion = db.Column(db.Text)
     imagen_url = db.Column(db.String(255))
-    categoria_id = db.Column(db.Integer, db.ForeignKey('categorias.id_categoria'), nullable=False)
-    region_id = db.Column(db.Integer, db.ForeignKey('regiones.id_region'), nullable=False)
-    usuario_id = db.Column(db.Integer, db.ForeignKey('usuarios.id_usuario'), nullable=False)
+    categoria_id = db.Column(db.Integer, db.ForeignKey('categorias.id_categoria', ondelete='SET NULL'), nullable=True)
+    region_id = db.Column(db.Integer, db.ForeignKey('regiones.id_region', ondelete='SET NULL'), nullable=True)
+    usuario_id = db.Column(db.Integer, db.ForeignKey('usuarios.id_usuario', ondelete='SET NULL'), nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.now(timezone.utc))
     updated_at = db.Column(db.DateTime, default=datetime.now(timezone.utc), onupdate=datetime.now(timezone.utc))
 
