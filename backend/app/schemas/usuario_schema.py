@@ -1,6 +1,6 @@
 from app import ma
 from app.models.usuarios import Usuario
-from marshmallow import fields
+from marshmallow import fields, validate
 
 class UsuarioSchema(ma.SQLAlchemySchema):
     class Meta:
@@ -8,9 +8,18 @@ class UsuarioSchema(ma.SQLAlchemySchema):
         load_instance = True  #Permite cargar directamente a un objeto Usuario
 
     id_usuario = ma.auto_field(dump_only=True)
-    nombre = ma.auto_field(required=True)
-    correo = ma.auto_field(required=True)
-    contraseña = ma.Str(required=True, load_only=True) # No volcar la contraseña
+    nombre = ma.auto_field(
+        required=True, 
+        validate=validate.Length(min=3, max=50, error='El Nombre debe tener mínimo 3 caracteres')
+    )
+    correo = ma.auto_field(
+        required=True,
+        validate=validate.Email(error='Correo electrónico inválido')
+    )
+    contraseña = ma.Str(
+        required=True, 
+        validate=validate.Length(min=7, max=50, error='La contraseña debe tener mínimo 7 caracteres'),
+        load_only=True)
     rol_id = ma.auto_field(required=True)
     created_at = fields.DateTime(dump_only=True)
     updated_at = fields.DateTime(dump_only=True)

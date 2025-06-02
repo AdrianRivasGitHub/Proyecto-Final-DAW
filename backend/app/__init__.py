@@ -25,7 +25,7 @@ def create_app():
     ma.init_app(app)
     migrate.init_app(app, db)
     jwt.init_app(app)
-    CORS(app)
+    CORS(app, origins="http://localhost:5173")
 
     #Registro de rutas
     from app.routes.alergenos_routes import alergenos_bp

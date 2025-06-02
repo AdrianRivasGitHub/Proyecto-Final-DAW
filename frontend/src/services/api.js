@@ -1,11 +1,32 @@
 import axios from 'axios';
 
+const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
 const API = axios.create({
-  baseURL: 'http://localhost:5000/api',
+  baseURL: apiBaseUrl,
+  // headers: { 'Content-Type': 'application/json' },
 });
 
-export const getPlanificaciones = () => axios.get(`${API_URL}/planificaciones`);
-export const createPlanificacion = (data) => axios.post(`${API_URL}/planificaciones`, data);
-export const getRecetas = () => axios.get(`${API_URL}/recetas`);
+API.interceptors.request.use(
+  (config) => {
+    // const token = localStorage.getItem('authToken');
+    // if (token) {
+    //   config.headers.Authorization = `Bearer ${token}`;
+    // }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
+API.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    // Manejar errores globales
+    // Se puede redirigir al login o limpiar el token.
+    // console.error('Error en la respuesta de la API:', error);
+    return Promise.reject(error); // Rechazar el error para que pueda ser capturado localmente también
+  }
+);
 
 export default API;

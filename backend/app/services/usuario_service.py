@@ -2,7 +2,7 @@ from app.models.usuarios import Usuario
 from app import db
 
 def listar_usuarios():
-    return Usuario.query.all()
+    return Usuario.query.order_by(Usuario.id_usuario.asc()).all()
 
 def obtener_usuario_por_id(id_usuario):
     return Usuario.query.get(id_usuario)

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { getRecetas, createPlanificacion } from '../services/api';
+import { createPlanificacion } from '../services/planificacionService';
+import { getRecetas } from '../services/recetaService';
 
 export default function FormPlanificacion() {
   const [nombre, setNombre] = useState('');

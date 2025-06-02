@@ -1,7 +1,6 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Dashboard from './pages/Dashboard';
-import './App.css'
 import FormPlanificacion from './components/FormPlanificacion';
 import CrearUsuarioPage from './pages/CrearUsuarioPage';
 import RecipesPage from './pages/RecipesPage';
