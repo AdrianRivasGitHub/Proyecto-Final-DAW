@@ -52,7 +52,7 @@ def eliminar_usuario_controller(id_usuario):
     usuario = eliminar_usuario(id_usuario)
     if not usuario:
         return jsonify({'Error': 'Usuario no encontrado'}), 404
-    return jsonify({'Mensaje': 'Usuario eliminado correctamente'}), 200
+    return jsonify({'Mensaje': 'Usuario eliminado correctamente'}), 204
 
 def obtener_usuario_por_correo_controller(correo):
     usuario = obtener_usuario_por_correo(correo)

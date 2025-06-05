@@ -90,5 +90,5 @@ def eliminar_receta_controller(id_receta):
     receta_eliminada = eliminar_receta(id_receta)
     if not receta_eliminada:
         return jsonify({'Error': 'Receta no encontrada'}), 404
-    return jsonify({'Mensaje': 'Receta eliminada correctamente'}), 200
+    return jsonify({'Mensaje': 'Receta eliminada correctamente'}), 204
     

@@ -13,7 +13,7 @@ ingredientes_schema = IngredienteSchema(many=True)
 
 def listar_ingredientes_controller():
     ingredientes = listar_ingredientes()
-    resultado = ingrediente_schema.dump(ingredientes)
+    resultado = ingredientes_schema.dump(ingredientes)
     return jsonify(resultado), 200
 
 def obtener_ingrediente_por_id_controller(id_ingrediente):
@@ -50,4 +50,4 @@ def eliminar_ingrediente_controller(id_ingrediente):
     ingrediente_eliminado = eliminar_ingrediente(id_ingrediente)
     if not ingrediente_eliminado:
         return jsonify({'Error': 'Ingrediente no encontrado'}), 404
-    return jsonify({'Mensaje': 'Ingrediente eliminado'}), 200
+    return jsonify({'Mensaje': 'Ingrediente eliminado'}), 204

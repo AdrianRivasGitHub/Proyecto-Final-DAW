@@ -26,6 +26,8 @@ Proyecto-Final-DAW/
 
 ### Frontend
 - React
+- Tailwind CSS
+- Shadecn/ui
 - ...
 
 ## Autor

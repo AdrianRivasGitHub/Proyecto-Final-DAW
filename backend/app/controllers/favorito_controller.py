@@ -27,7 +27,7 @@ def eliminar_favorito_controller(id_favorito):
     favorito_eliminado = eliminar_favorito(id_favorito)
     if not favorito_eliminado: 
         return jsonify({'Error': 'Favorito no encontrado'}), 404
-    return jsonify({'Mensaje': 'Favorito eliminado correctamente'}), 200
+    return jsonify({'Mensaje': 'Favorito eliminado correctamente'}), 204
 
 def listar_favoritos_por_usuario_controller(usuario_id):
     favoritos = listar_favoritos_por_usuario(usuario_id)

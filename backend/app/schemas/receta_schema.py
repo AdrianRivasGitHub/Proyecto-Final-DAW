@@ -1,5 +1,5 @@
 from app import ma
-from marshmallow import fields
+from marshmallow import fields, validate
 from app.models.recetas import Receta
 
 class RecetaSchema(ma.SQLAlchemySchema):
@@ -9,9 +9,12 @@ class RecetaSchema(ma.SQLAlchemySchema):
         include_fk = True  #Para incluir las claves foráneas en el schema
 
     id_receta = ma.auto_field(dump_only=True)
-    nombre = ma.auto_field(required=True)
+    nombre = ma.auto_field(
+        required=True,
+        validate=validate.Length(min=3, max=50, error='El Nombre debe tener mínimo 3 caracteres')
+    )
     descripcion = ma.auto_field()
-    preparacion = ma.auto_field()
+    preparacion = ma.auto_field(required=True)
     imagen_url = ma.auto_field()
     categoria_id = ma.auto_field(required=True)
     region_id = ma.auto_field(required=True)
@@ -22,7 +25,7 @@ class RecetaSchema(ma.SQLAlchemySchema):
     # Mostrar los nombres de las relaciones en lugar de los IDs:
     categoria = fields.Nested('CategoriaSchema', only=['nombre'])
     region = fields.Nested('RegionSchema', only=['nombre'])
-    usuario = fields.Nested('UsuarioSchema', only=['nombre', 'correo'])
+    usuario = fields.Nested('UsuarioSchema', only=['nombre', 'correo', 'rol'])
 
     # Listados de ingredientes, alérgenos y subcategorías asociados a la receta
     ingredientes_receta = fields.Nested('RecetaIngredienteSchema', many=True, dump_only=True)

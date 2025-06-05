@@ -16,7 +16,7 @@ export default function HomePage() {
   const [recetas, setRecetas] = useState([]);
   const [categorias, setCategorias] = useState([]);
   const [regiones, setRegiones] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [filtro, setFiltro] = useState('');
   const navigate = useNavigate();
@@ -32,51 +32,53 @@ export default function HomePage() {
   };
 
   useEffect(() => {
-    cargarRecetas();
-    cargarCategorias();
-    cargarRegiones();
+    fetchRecetas();
+    fetchCategorias();
+    fetchRegiones();
   }, []);
 
-  const cargarRecetas = async () => {
+  const fetchRecetas = async () => {
+    setIsLoading(true);
     try {
-      setLoading(true);
       setError(null); // Limpiar el mensaje de error
       const response = await recetasService.getRecetas();
-      console.log('Respuesta de la API:', response.data);
       setRecetas(response.data);
-    } catch (err) {
-      console.error('Error al cargar recetas:', err);
+      console.log('Respuesta de la API:', response.data);
+    } catch (error) {
+      console.error('Error al obtener las recetas:', error);
       setError('No se pudieron cargar las recetas. Inténtalo de nuevo más tarde.');
+    } finally {
+      setIsLoading(false);
     }
-    setLoading(false);
   };
 
-  const cargarCategorias = async () => {
+  const fetchCategorias = async () => {
+    setIsLoading(true);
     try {
-      setLoading(true);
       setError(null); // Limpiar el mensaje de error
       const response = await categoriasService.getCategorias();
-      console.log('Respuesta de la API:', response.data);
       setCategorias(response.data);
-    } catch (err) {
-      console.error('Error al cargar categorias:', err);
+      console.log('Respuesta de la API:', response.data);
+    } catch (error) {
+      console.error('Error al cargar categorias:', error);
       setError('No se pudieron cargar las cateegorias. Inténtalo de nuevo más tarde.');
+    } finally {
+      setIsLoading(false)
     }
-    setLoading(false);
   };
 
-  const cargarRegiones = async () => {
+  const fetchRegiones = async () => {
+    setIsLoading(true);
     try {
-      setLoading(true);
       setError(null); // Limpiar el mensaje de error
       const response = await regionesService.getRegiones();
-      console.log('Respuesta de la API:', response.data);
       setRegiones(response.data);
-    } catch (err) {
-      console.error('Error al cargar regiones:', err);
+      console.log('Respuesta de la API:', response.data);
+    } catch (error) {
+      console.error('Error al cargar regiones:', error);
       setError('No se pudieron cargar las regiones. Inténtalo de nuevo más tarde.');
     }
-    setLoading(false);
+    setIsLoading(false);
   };
 
   return (

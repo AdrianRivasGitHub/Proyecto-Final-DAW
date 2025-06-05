@@ -7,6 +7,7 @@ from app.services.planificacion_service import (
     actualizar_planificacion,
     eliminar_planificacion
 )
+from app.helpers.planificacion_helper import validar_fechas_planificacion
 
 planificacion_schema = PlanificacionSchema()
 planificaciones_schema = PlanificacionSchema(many=True)
@@ -17,6 +18,12 @@ def crear_planificacion_controller():
     
     if errores:
         return jsonify(errores), 400
+
+    # Validamos fechas
+    try:
+        validar_fechas_planificacion(data['fecha_inicio'], data['fecha_fin'])
+    except ValueError as ve:
+        return jsonify({"Error": str(ve)}), 400
 
     # Validamos que venga el array de recetas
     recetas = data.get('recetas')
@@ -54,6 +61,13 @@ def actualizar_planificacion_controller(id_planificacion):
     if errores:
         return jsonify(errores), 400
 
+    # Validar fechas solo si se envían en el update
+    if 'fecha_inicio' in data and 'fecha_fin' in data:
+        try:
+            validar_fechas_planificacion(data['fecha_inicio'], data['fecha_fin'])
+        except ValueError as ve:
+            return jsonify({"Error": str(ve)}), 400
+
     try:
         planificacion_actualizada = actualizar_planificacion(id_planificacion, data)
     except ValueError as ve:
@@ -69,4 +83,4 @@ def eliminar_planificacion_controller(id_planificacion):
     planificacion_eliminada = eliminar_planificacion(id_planificacion)
     if not planificacion_eliminada:
         return jsonify({"Error": "Planificación no encontrada"}), 404
-    return jsonify({"Mensaje": "Planificación eliminada correctamente"}), 200
+    return jsonify({"Mensaje": "Planificación eliminada correctamente"}), 204

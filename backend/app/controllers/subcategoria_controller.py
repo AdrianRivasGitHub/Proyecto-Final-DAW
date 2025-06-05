@@ -48,4 +48,4 @@ def eliminar_subcategoria_controller(id_subcategoria):
     subcategoria_eliminada = eliminar_subcategoria(id_subcategoria)
     if not subcategoria_eliminada:
         return jsonify({'Error': 'Subcategoría no encontrada'}), 404
-    return jsonify({'Mensaje': 'Subcategoría eliminada correctamente'}), 200
+    return jsonify({'Mensaje': 'Subcategoría eliminada correctamente'}), 204

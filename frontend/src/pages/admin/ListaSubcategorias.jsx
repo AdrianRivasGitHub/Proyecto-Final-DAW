@@ -59,7 +59,7 @@ export default function ListaSubcategorias() {
     setIsDialogOpen(true)
   }
 
-  const handleEdit = (subcategoria) => {
+  const handleEdit = async (subcategoria) => {
     setEditingSubcategoria(subcategoria)
     setFormData({
       nombre: subcategoria.nombre,
@@ -69,8 +69,8 @@ export default function ListaSubcategorias() {
   }
 
   const handleSave = async () => {
-    if (!formData.nombre || !formData.descripcion ) {
-      setError("Por favor completa todos los campos obligatorios")
+    if (!formData.nombre) {
+      setError("Por favor ingrese un nombre para la subcategoría")
       return
     }
 
@@ -124,7 +124,7 @@ export default function ListaSubcategorias() {
     try {
       const response = await subcategoriaService.deleteSubcategoria(subcategoriaId);
 
-      if(response.status == 204){
+      if(response.status === 204){
         fetchSubcategorias()
         toast.success("¡Éxito!", {
           description: "La subcategoria ha sido eliminada correctamente.",

@@ -2,7 +2,7 @@ from app import db
 from app.models.ingredientes import Ingrediente
 
 def listar_ingredientes():
-    return Ingrediente.query.all()
+    return Ingrediente.query.order_by(Ingrediente.id_ingrediente.asc()).all()
 
 def obtener_ingrediente_por_id(id_ingrediente):
     return Ingrediente.query.get(id_ingrediente)

@@ -12,7 +12,7 @@ def listar_recetas():
     """
     Lista todas las recetas ordenadas por fecha de creación
     """
-    return Receta.query.order_by(Receta.created_at.desc()).all()
+    return Receta.query.order_by(Receta.created_at.asc()).all()
 
 def buscar_recetas(nombre):
     """
