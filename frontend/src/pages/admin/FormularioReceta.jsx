@@ -17,6 +17,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "../../components/ui/dialog"
+import { toast } from "sonner"
 import { ArrowLeft, Save, Upload, Plus, X, Search, ChevronDown, ChevronUp, AlertTriangle } from "lucide-react"
 import AdminLayout from '@/components/admin/AdminLayout'
 import categoriaService from "@/services/categoriaService"
@@ -41,10 +42,12 @@ export default function FormularioReceta() {
     descripcion: "",
     preparacion: "",
     imagen_url: "",
+    imagenFile: null,
     categoria_id: "",
     region_id: "",
     subcategorias: [],
     ingredientes: [],
+    usuario_id:1,
   })
 
   const [isIngredientDialogOpen, setIsIngredientDialogOpen] = useState(false)
@@ -55,15 +58,17 @@ export default function FormularioReceta() {
   const [isSaving, setIsSaving] = useState(false)
 
   useEffect(() => {
-    //fetchRecetas();
-    fetchCategorias();
-    fetchRegiones();
-    fetchSubcategorias();
-    fetchIngredientes();
-    if (isEditing) {
-      // Cargar datos de la receta para editar
-      loadRecipeData(id)
-    }
+    const cargarDatos = async () => {
+      await fetchRegiones();
+      await fetchCategorias();
+      await fetchSubcategorias();
+      await fetchIngredientes();
+      if (isEditing) {
+        // Cargar datos de la receta para editar
+        await loadRecipeData(id);
+      }
+    };
+    cargarDatos();
   }, [id, isEditing])
 
   const unidades = ["gr", "kg", "ml", "l", "unidad", "taza", "cucharada", "cucharadita", "pizca", "al gusto"]
@@ -105,10 +110,10 @@ export default function FormularioReceta() {
       setError(null); // Limpiar el mensaje de error
       const response = await subcategoriaService.getSubcategorias();
       setSubcategorias(response.data);
-      console.log(response.data);
+      console.log('Respuesta de la API:', response.data);
     } catch (error) {
       console.error('Error al obtener las subcategorías', error);
-      setError("Error de conexión");
+      setError('No se pudieron cargar las subcategorias. Inténtalo de nuevo más tarde.');
     } finally {
       setIsLoading(false)
     }
@@ -129,25 +134,46 @@ export default function FormularioReceta() {
     }
   }
 
-  const loadRecipeData = (recipeId) => {
-    // Simulación de carga de datos
-    const mockRecipe = {
-      nombre: "Ceviche Clásico",
-      descripcion: "El plato bandera del Perú con pescado fresco",
-      preparacion:
-        "Cortar el pescado en cubos de 2cm. Exprimir los limones y marinar el pescado por 15 minutos. Cortar la cebolla en juliana fina. Mezclar todos los ingredientes y servir inmediatamente con camote y choclo.",
-      imagen_url: "",
-      categoria_id: "1",
-      region_id: "1",
-      subcategorias: [1, 6],
-      ingredientes: [
-        { ingrediente_id: 1, cantidad: "500", unidad: "gr" },
-        { ingrediente_id: 2, cantidad: "8", unidad: "unidad" },
-        { ingrediente_id: 3, cantidad: "1", unidad: "unidad" },
-        { ingrediente_id: 4, cantidad: "2", unidad: "unidad" },
-      ],
+  const loadRecipeData = async (recipeId) => {
+    setIsLoading(true);
+    setError("");
+    try {
+      const response = await recetaService.getRecetaById(recipeId);
+      const recetaData = response.data;
+      const apiUrlBase = import.meta.env.VITE_API_BASE_URL.replace('/api', '');
+      console.log("Receta cargada:", recetaData);
+
+      setFormData({
+        nombre: recetaData.nombre || "",
+        descripcion: recetaData.descripcion || "",
+        preparacion: recetaData.preparacion || "",
+        imagen_url: recetaData.imagen_url ? `${apiUrlBase}${recetaData.imagen_url}` : "",
+        imagenFile: null, // Se resetea al cargar, el usuario debe volver a subir si quiere cambiarla
+        categoria_id: recetaData.categoria_id ? recetaData.categoria_id.toString() : "",
+        region_id: recetaData.region_id ? recetaData.region_id.toString() : "",
+        subcategorias: recetaData.subcategorias_receta ? recetaData.subcategorias_receta.map(sub => sub.subcategoria_id) : [],
+        ingredientes: recetaData.ingredientes_receta ? recetaData.ingredientes_receta.map(ing => ({
+          ingrediente_id: ing.ingrediente_id,
+          nombre: ing.ingrediente.nombre,
+          cantidad: ing.cantidad.toString(),
+          unidad: ing.unidad,
+          alergeno: ing.ingrediente.alergeno
+        })) : [],
+        usuario_id: recetaData.usuario_id ? recetaData.usuario_id : 1,
+      });
+
+      console.log("Datos cargados:", formData);
+
+    } catch (err) {
+      console.error("Error al cargar los datos de la receta:", err);
+      setError("No se pudieron cargar los datos de la receta. Inténtalo de nuevo.");
+      toast.error("Error", {
+        description: "No se pudieron cargar los datos de la receta.",
+      });
+      // navigate("/admin/recetas"); 
+    } finally {
+      setIsLoading(false);
     }
-    setFormData(mockRecipe)
   }
 
   const filteredIngredientes = ingredientes.filter((ingrediente) =>
@@ -204,7 +230,7 @@ export default function FormularioReceta() {
     const file = event.target.files[0]
     if (file) {
       console.log("Subiendo imagen:", file)
-      setFormData({ ...formData, imagen_url: URL.createObjectURL(file) })
+      setFormData({ ...formData, imagen_url: URL.createObjectURL(file), imagenFile: file })
     }
   }
 
@@ -221,9 +247,14 @@ export default function FormularioReceta() {
     if (formData.ingredientes.length === 0) {
       return "Debe agregar al menos un ingrediente";
     }
-    const invalidIngredients = formData.ingredientes.filter((ing) => !ing.cantidad.trim());
-    if (invalidIngredients.length > 0) {
-      return "Todos los ingredientes deben tener una cantidad especificada";
+    for (const ing of formData.ingredientes) {
+      if (!ing.cantidad.toString().trim()) {
+        return `El ingrediente "${ing.nombre}" debe tener una cantidad especificada.`;
+      }
+      const cantidadNum = parseFloat(ing.cantidad);
+      if (isNaN(cantidadNum) || cantidadNum <= 0) {
+        return `La cantidad para el ingrediente "${ing.nombre}" debe ser un número mayor que cero.`;
+      }
     }
     if (!formData.preparacion.trim()) {
       return "Es obligatorio llenar la preparación.";
@@ -242,23 +273,74 @@ export default function FormularioReceta() {
       return;
     }
     try {
-      let response;
-      if (isEditing) {
-        response = await recetaService.updateReceta(id, formData);
-      } else {
-        response = await recetaService.createReceta(formData);
+      const formDataToSend = new FormData();
+      formDataToSend.append("nombre", formData.nombre);
+      formDataToSend.append("descripcion", formData.descripcion);
+      formDataToSend.append("preparacion", formData.preparacion);
+      formDataToSend.append("categoria_id", formData.categoria_id);
+      formDataToSend.append("region_id", formData.region_id);
+      formDataToSend.append("usuario_id", formData.usuario_id);
+      formDataToSend.append("subcategorias", JSON.stringify(formData.subcategorias));
+      formDataToSend.append("ingredientes", JSON.stringify(formData.ingredientes));
+
+      if (formData.imagenFile) {
+        formDataToSend.append("imagen", formData.imagenFile);
+      } else if (!formData.imagen_url) {
+        // Solo enviar eliminar_imagen si la imagen fue eliminada (no hay imagenFile ni imagen_url)
+        formDataToSend.append("eliminar_imagen", true);
       }
 
-      console.log("Guardando receta:", formData)
-     
+      console.log(formDataToSend);
 
-      // Simulación de llamada a API
+      let response;
+      if (isEditing) {
+        response = await recetaService.updateReceta(id, formDataToSend);
+      } else {
+        response = await recetaService.createReceta(formDataToSend);
+        console.log(formDataToSend);
+      }
+
       await new Promise((resolve) => setTimeout(resolve, 1000))
 
+      if (response.status === 200 || response.status === 201) {
+        setError("");
+        console.log("Guardando receta:", formData)
+        // fetchRecetas();
+        toast.success(isEditing ? "Receta actualizada!" : "Receta creada!", {
+          description: isEditing
+            ? "La receta ha sido actualizada correctamente."
+            : "La receta ha sido creada correctamente.",
+        });
+      } else {
+        setError("Error al guardar la receta");
+        toast.error("Error", {
+          description: "No se pudo guardar la receta.",
+        });
+      }
+
+      console.log("Guardando receta:", formDataToSend)
       navigate("/admin/recetas")
     } catch (error) {
-      console.error("Error al guardar:", error)
-      setError("Error al guardar la receta")
+
+      if(error.status === 415){
+          setError("El tipo de archivo subido no es el correcto.")
+      }else if (error.response) {
+        const data = error.response.data;
+        let mensaje = "Error del servidor al guardar la receta";
+        if (typeof data === "object" && data !== null) {
+          if (data.nombre && Array.isArray(data.nombre)) {
+            mensaje = data.nombre[0];
+          }
+        } else if (data.message) {
+          mensaje = data.message;
+        }
+        setError(mensaje);
+        toast.error("Error", { description: mensaje });
+        console.log(error);
+        console.error("Error Server responded:", error.status);
+      } else {
+        setError("Error de conexión o configuración del cliente al guardar la receta");
+      }
     } finally {
       setIsSaving(false)
     }
@@ -271,6 +353,17 @@ export default function FormularioReceta() {
         <AlertTriangle className="h-3 w-3 mr-1" />
         {alergeno.nombre}
       </Badge>
+    )
+  }
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-96">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Cargando receta...</p>
+        </div>
+      </div>
     )
   }
 
@@ -380,12 +473,10 @@ export default function FormularioReceta() {
                 </CardContent>
               </Card>
 
-
-
               {/* Preparacion */}
               <Card>
                 <CardHeader>
-                  <CardTitle>Preparación</CardTitle>
+                  <CardTitle>Preparación *</CardTitle>
                   <CardDescription>Instrucciones detalladas para preparar la receta</CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -413,7 +504,7 @@ export default function FormularioReceta() {
                     {formData.imagen_url && (
                       <div className="relative">
                         <img
-                          src={formData.imagen_url || "/placeholder.svg"}
+                          src={formData.imagen_url ? formData.imagen_url : "/placeholder.svg"}
                           alt="Preview"
                           className="w-full h-48 object-cover rounded-lg"
                         />
@@ -422,22 +513,24 @@ export default function FormularioReceta() {
                           variant="outline"
                           size="sm"
                           className="absolute top-2 right-2"
-                          onClick={() => setFormData({ ...formData, imagen_url: "" })}
+                          onClick={() => setFormData({ ...formData, imagen_url: "", imagenFile: null })}
                         >
                           <X className="h-4 w-4" />
                         </Button>
                       </div>
                     )}
-                    <div>
-                      <Label htmlFor="imagen" className="cursor-pointer">
-                        <div className="w-full border-2 border-dashed border-orange-300 rounded-sm p-6 text-center hover:border-red-400 transition-colors">
-                          <Upload className="h-8 w-8 mx-auto mb-2 text-gray-400" />
-                          <p className="text-sm text-gray-600">Haz clic para subir una imagen</p>
-                          <p className="text-xs text-gray-500">PNG, JPG hasta 5MB</p>
-                        </div>
-                      </Label>
-                      <Input id="imagen" type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
-                    </div>
+                    {!formData.imagen_url && (
+                      <div>
+                        <Label htmlFor="imagen" className="cursor-pointer">
+                          <div className="w-full border-2 border-dashed border-orange-300 rounded-sm p-6 text-center hover:border-red-400 transition-colors">
+                            <Upload className="h-8 w-8 mx-auto mb-2 text-gray-400" />
+                            <p className="text-sm text-gray-600">Haz clic para subir una imagen</p>
+                            <p className="text-xs text-gray-500">PNG, JPG hasta 5MB</p>
+                          </div>
+                        </Label>
+                        <Input id="imagen" type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
+                      </div>
+                    )}
                   </div>
                 </CardContent>
               </Card>
@@ -590,7 +683,7 @@ export default function FormularioReceta() {
               </div>
               <div className="grid grid-cols-2 gap-2 max-h-96 overflow-y-auto">
                 {paginadoIngredientes.map((ingrediente) => {
-                  const añadido = formData.ingredientes.some((ing) => ing.ingrediente_id === ingrediente.id)
+                  const añadido = formData.ingredientes.some((ing) => ing.ingrediente_id === ingrediente.id_ingrediente)
                   return (
                     <div
                       key={ingrediente.id_ingrediente}

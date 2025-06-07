@@ -26,17 +26,18 @@ def obtener_receta_por_id(id_receta):
     return Receta.query.get(id_receta)
 
 def crear_receta(data):
+    print("DEBUG [crear_receta]: Llamando a validar_datos_receta.")
     validar_datos_receta(data)
-
+    print("DEBUG [crear_receta]: validar_datos_receta completado.")
     with db.session.begin():
         nueva_receta = Receta(
             nombre=data['nombre'],
             descripcion=data.get('descripcion'),
             preparacion=data.get('preparacion'),
             imagen_url=data.get('imagen_url'),
-            categoria_id=data['categoria_id'],
-            region_id=data['region_id'],
-            usuario_id=data['usuario_id'],
+            categoria_id=int(data['categoria_id']),
+            region_id=int(data['region_id']),
+            usuario_id=int(data['usuario_id']),
             created_at=datetime.now(timezone.utc),
             updated_at=datetime.now(timezone.utc)
         )
@@ -57,14 +58,21 @@ def crear_receta(data):
         # Mayor velocidad que con db.session.add_all(ingredientes)
         db.session.bulk_save_objects(ingredientes)
 
+        # Obtener alérgenos únicos de los ingredientes
+        from app.models.ingredientes import Ingrediente
+        ingrediente_ids = [ing['ingrediente_id'] for ing in ingredientes_data]
+        ingredientes_objs = Ingrediente.query.filter(Ingrediente.id_ingrediente.in_(ingrediente_ids)).all()
+        alergeno_ids = set(
+            ing.alergeno_id for ing in ingredientes_objs if ing.alergeno_id is not None
+        )
+
         # Alergenos
-        alergenos_data = data.get('alergenos', [])
         alergenos = [
             RecetaAlergeno(
                 receta_id=nueva_receta.id_receta,
-                alergeno_id=alergeno["alergeno_id"]
+                alergeno_id=alergeno_id
             )
-            for alergeno in alergenos_data
+            for alergeno_id in alergeno_ids
         ]
         db.session.bulk_save_objects(alergenos)
 
@@ -73,70 +81,85 @@ def crear_receta(data):
         subcategorias = [
             RecetaSubcategoria(
                 receta_id=nueva_receta.id_receta,
-                subcategoria_id=sub["subcategoria_id"]
+                subcategoria_id=sub_id
             )
-            for sub in subcategorias_data
+            for sub_id in subcategorias_data
         ]
-        db.session.bulk_save_objects(subcategorias)
+        try:
+            db.session.bulk_save_objects(subcategorias)
+        except Exception as e:
+            print("Error al guardar subcategorias:", e)
+            raise
 
     #db.session.commit()
     return nueva_receta
 
 def actualizar_receta(id_receta, data):
+    print("DEBUG [actualizar_receta]: Llamando a validar_datos_receta.")
     validar_datos_receta(data)
+    print("DEBUG [actualizar_receta]: validar_datos_receta completado.")
 
     receta = Receta.query.get(id_receta)
     if not receta:
         return None
     
-    with db.session.begin():
-        receta.nombre = data.get('nombre', receta.nombre)
-        receta.descripcion = data.get('descripcion', receta.descripcion)
-        receta.preparacion = data.get('preparacion', receta.preparacion)
-        receta.imagen_url = data.get('imagen_url', receta.imagen_url)
-        receta.categoria_id = data.get('categoria_id', receta.categoria_id)
-        receta.region_id = data.get('region_id', receta.region_id)
-        receta.updated_at = datetime.now(timezone.utc)
-        
-        # Limpiar registros anteriores
-        db.session.query(RecetaIngrediente).filter_by(receta_id=id_receta).delete()
-        db.session.query(RecetaAlergeno).filter_by(receta_id=id_receta).delete()
-        db.session.query(RecetaSubcategoria).filter_by(receta_id=id_receta).delete()
+    receta.nombre = data.get('nombre', receta.nombre)
+    receta.descripcion = data.get('descripcion', receta.descripcion)
+    receta.preparacion = data.get('preparacion', receta.preparacion)
+    receta.imagen_url = data.get('imagen_url', receta.imagen_url)
+    receta.categoria_id = int(data.get('categoria_id', receta.categoria_id))
+    receta.region_id = int(data.get('region_id', receta.region_id))
+    receta.usuario_id = int(data.get('usuario_id', receta.usuario_id))
+    receta.updated_at = datetime.now(timezone.utc)
+    
+    # Limpiar registros anteriores
+    db.session.query(RecetaIngrediente).filter_by(receta_id=id_receta).delete()
+    db.session.query(RecetaAlergeno).filter_by(receta_id=id_receta).delete()
+    db.session.query(RecetaSubcategoria).filter_by(receta_id=id_receta).delete()
 
-        # Insertar nuevos ingredientes
-        ingredientes_data = data.get('ingredientes', [])
-        ingredientes = [
-            RecetaIngrediente(
-                receta_id=id_receta,
-                ingrediente_id=ing['ingrediente_id'],
-                cantidad=ing['cantidad'],
-                unidad=ing['unidad']
-            )
-            for ing in ingredientes_data
-        ]
-        db.session.bulk_save_objects(ingredientes)
+    # Insertar nuevos ingredientes
+    ingredientes_data = data.get('ingredientes', [])
+    ingredientes = [
+        RecetaIngrediente(
+            receta_id=id_receta,
+            ingrediente_id=ing['ingrediente_id'],
+            cantidad=ing['cantidad'],
+            unidad=ing['unidad']
+        )
+        for ing in ingredientes_data
+    ]
+    db.session.bulk_save_objects(ingredientes)
 
-        # Alergenos
-        alergenos_data = data.get('alergenos', [])
-        alergenos = [
-            RecetaAlergeno(
-                receta_id=id_receta,
-                alergeno_id=alergeno["alergeno_id"]
-            )
-            for alergeno in alergenos_data
-        ]
-        db.session.bulk_save_objects(alergenos)
+    # Obtener alérgenos únicos de los ingredientes
+    from app.models.ingredientes import Ingrediente
+    ingrediente_ids = [ing['ingrediente_id'] for ing in ingredientes_data]
+    ingredientes_objs = Ingrediente.query.filter(Ingrediente.id_ingrediente.in_(ingrediente_ids)).all()
+    alergeno_ids = set(
+        ing.alergeno_id for ing in ingredientes_objs if ing.alergeno_id is not None
+    )
 
-        # Subcategorías
-        subcategorias_data = data.get('subcategorias', [])
-        subcategorias = [
-            RecetaSubcategoria(
-                receta_id=id_receta,
-                subcategoria_id=sub["subcategoria_id"]
-            )
-            for sub in subcategorias_data
-        ]
-        db.session.bulk_save_objects(subcategorias)        
+    # Alergenos
+    alergenos = [
+        RecetaAlergeno(
+            receta_id=id_receta,
+            alergeno_id=alergeno_id
+        )
+        for alergeno_id in alergeno_ids
+    ]
+    db.session.bulk_save_objects(alergenos)
+
+    # Subcategorías
+    subcategorias_data = data.get('subcategorias', [])
+    subcategorias = [
+        RecetaSubcategoria(
+            receta_id=id_receta,
+            subcategoria_id=sub
+        )
+        for sub in subcategorias_data
+    ]
+    db.session.bulk_save_objects(subcategorias)
+    
+    db.session.commit()
     return receta
 
 def eliminar_receta(id_receta):

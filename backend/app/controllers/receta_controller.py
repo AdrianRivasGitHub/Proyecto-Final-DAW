@@ -1,4 +1,6 @@
-from flask import jsonify, request
+from flask import jsonify, request, current_app
+from werkzeug.utils import secure_filename
+import os
 from app.schemas.receta_schema import RecetaSchema
 from app.services.receta_service import (
     crear_receta,
@@ -46,7 +48,35 @@ def listar_recetas_por_region_controller(region_id):
     return jsonify(recetas_schema.dump(recetas)), 200
 
 def crear_receta_controller():
-    data = request.get_json()
+    # Cambia a multipart/form-data para recibir archivos como imagenes
+    if request.content_type and 'multipart/form-data' in request.content_type:
+        data = request.form.to_dict()
+        # Convertir campos que son listas de JSON string a lista
+        import json
+        for key in ['ingredientes', 'subcategorias']:
+            if key in data and isinstance(data[key], str):
+                try:
+                    data[key] = json.loads(data[key])
+                except Exception:
+                    data[key] = []
+        imagen = request.files.get('imagen')
+        imagen_url = None
+        if imagen:
+            filename = secure_filename(imagen.filename)
+            upload_folder = os.path.join(current_app.root_path, 'static', 'uploads')
+            os.makedirs(upload_folder, exist_ok=True)
+            filepath = os.path.join(upload_folder, filename)
+            imagen.save(filepath)
+            imagen_url = f'/static/uploads/{filename}'
+        data['imagen_url'] = imagen_url
+        #print("Subcategoriass recibidos:", data)
+    else:
+        data = request.get_json()
+
+    # Eliminar campo eliminar_imagen antes de validar
+    if 'eliminar_imagen' in data:
+        del data['eliminar_imagen']
+
     errores = receta_schema.validate(data)
 
     if errores:
@@ -69,19 +99,47 @@ def crear_receta_controller():
     return jsonify(resultado), 201
 
 def actualizar_receta_controller(id_receta):
-    data = request.get_json()
-    errores = receta_schema.validate(data, partial=True)
+    # Cambia a multipart/form-data para recibir archivos como imagenes
+    if request.content_type and 'multipart/form-data' in request.content_type:
+        data = request.form.to_dict()
+        import json
+        for key in ['ingredientes', 'subcategorias']:
+            if key in data and isinstance(data[key], str):
+                try:
+                    data[key] = json.loads(data[key])
+                except Exception:
+                    data[key] = []
+        imagen = request.files.get('imagen')
+        eliminar_imagen = data.get('eliminar_imagen') == 'true'
+        imagen_url = None
+        if imagen:
+            filename = secure_filename(imagen.filename)
+            upload_folder = os.path.join(current_app.root_path, 'static', 'uploads')
+            os.makedirs(upload_folder, exist_ok=True)
+            filepath = os.path.join(upload_folder, filename)
+            imagen.save(filepath)
+            imagen_url = f'/static/uploads/{filename}'
+            data['imagen_url'] = imagen_url
+        elif eliminar_imagen:
+            data['imagen_url'] = None
+        #print("Subcategoriass recibidos:", data)            
+        # Si no hay imagen nueva ni se elimina, no se modifica imagen_url
+    else:
+        data = request.get_json()
 
+    # Eliminar campo eliminar_imagen antes de validar
+    if 'eliminar_imagen' in data:
+        del data['eliminar_imagen']
+
+    errores = receta_schema.validate(data, partial=True)
     if errores:
         return jsonify(errores), 400
-    
     try:
         receta_actualizada = actualizar_receta(id_receta, data)
     except ValueError as ve:
         return jsonify({"Error": str(ve)}), 400
     except Exception as e:
         return jsonify({"Error": str(e)}), 500    
-
     if not receta_actualizada:
         return jsonify({'Error': 'Receta no encontrada'}), 404
     return jsonify(receta_schema.dump(receta_actualizada)), 200
@@ -91,4 +149,3 @@ def eliminar_receta_controller(id_receta):
     if not receta_eliminada:
         return jsonify({'Error': 'Receta no encontrada'}), 404
     return jsonify({'Mensaje': 'Receta eliminada correctamente'}), 204
-    

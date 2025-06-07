@@ -20,3 +20,6 @@ __pycache__/
 
 #archivos varios
 estructura_bbdd.txt
+
+# Subidas de imagenes locales
+backend/app/static/uploads

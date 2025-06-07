@@ -8,13 +8,12 @@ def hay_duplicados_por_clave(lista, clave):
 def validar_datos_receta(data):
     errores = []
 
-    if hay_duplicados_por_clave(data.get("ingredientes", []), "ingrediente_id"):
+    ingredientes_list = data.get("ingredientes", [])
+    if ingredientes_list and hay_duplicados_por_clave(ingredientes_list, "ingrediente_id"):
         errores.append("No se permiten ingredientes duplicados.")
-    
-    if hay_duplicados_por_clave(data.get("alergenos", []), "alergeno_id"):
-        errores.append("No se permiten alérgenos duplicados.")
-    
-    if hay_duplicados_por_clave(data.get("subcategorias", []), "subcategoria_id"):
+
+    subcategorias_ids = data.get("subcategorias", [])
+    if subcategorias_ids and (len(subcategorias_ids) != len(set(subcategorias_ids))): # Comprueba duplicados en la lista de IDs directamente
         errores.append("No se permiten subcategorías duplicadas.")
 
     # Si hay errores los lanza

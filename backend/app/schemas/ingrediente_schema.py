@@ -18,4 +18,4 @@ class IngredienteSchema(ma.SQLAlchemySchema):
     created_at = fields.DateTime(dump_only=True)
     updated_at = fields.DateTime(dump_only=True)    
 
-    alergeno = fields.Nested('AlergenoSchema', only=['nombre'])
+    alergeno = fields.Nested('AlergenoSchema', only=['id_alergeno','nombre'])

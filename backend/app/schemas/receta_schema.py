@@ -22,6 +22,9 @@ class RecetaSchema(ma.SQLAlchemySchema):
     created_at = fields.DateTime(dump_only=True)
     updated_at = fields.DateTime(dump_only=True)
 
+    ingredientes = fields.List(fields.Raw(), load_only=True)
+    subcategorias = fields.List(fields.Integer(), load_only=True)
+
     # Mostrar los nombres de las relaciones en lugar de los IDs:
     categoria = fields.Nested('CategoriaSchema', only=['nombre'])
     region = fields.Nested('RegionSchema', only=['nombre'])
@@ -31,3 +34,5 @@ class RecetaSchema(ma.SQLAlchemySchema):
     ingredientes_receta = fields.Nested('RecetaIngredienteSchema', many=True, dump_only=True)
     alergenos_receta = fields.Nested('RecetaAlergenoSchema', many=True, dump_only=True)
     subcategorias_receta = fields.Nested('RecetaSubcategoriaSchema', many=True, dump_only=True)
+    #ingredientes = fields.List(fields.Nested('RecetaIngredienteSchema'), load_only=True)
+    #subcategorias = fields.List(fields.Nested('RecetaSubcategoriaSchema'), load_only=True)

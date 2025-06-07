@@ -14,6 +14,6 @@ class RecetaIngredienteSchema(ma.SQLAlchemySchema):
     cantidad = ma.auto_field(required=True)
     unidad = ma.auto_field(required=True)
 
-    ingrediente = fields.Nested('IngredienteSchema', only=['nombre'])
+    ingrediente = fields.Nested('IngredienteSchema', only=['nombre', 'alergeno'])
     receta = fields.Nested('RecetaSchema', only=['nombre'])
     

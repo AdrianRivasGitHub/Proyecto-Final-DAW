@@ -6,6 +6,7 @@ import { Badge } from "../../components/ui/badge"
 import { Input } from "../../components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/select"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../components/ui/tabs"
+import { toast } from "sonner"
 import { Search, Plus, Eye, Edit, Trash2, CheckCircle, XCircle, MapPin, User, Calendar } from "lucide-react"
 import AdminLayout from '@/components/admin/AdminLayout'
 import recetaService from "@/services/recetaService"
@@ -41,7 +42,7 @@ export default function ListaRecetas() {
       setError("Error de conexión");
     } finally {
       setIsLoading(false)
-    }    
+    }
   }
 
   const fetchCategorias = async () => {
@@ -71,7 +72,7 @@ export default function ListaRecetas() {
       setError('No se pudieron cargar las regiones. Inténtalo de nuevo más tarde.');
     }
     setIsLoading(false);
-  }; 
+  };
 
   const recetasPublicadas = recetas.filter((r) => r.usuario.rol.nombre_rol === "Admin")
   const recetasPendientes = recetas.filter((r) => r.usuario.rol.nombre_rol === "Usuario")
@@ -117,7 +118,7 @@ export default function ListaRecetas() {
     try {
       const response = await recetaService.deleteReceta(recetaId);
 
-      if(response.status === 204){
+      if (response.status === 204) {
         fetchRecetas()
         toast.success("¡Éxito!", {
           description: "La receta ha sido eliminada correctamente.",
@@ -134,9 +135,9 @@ export default function ListaRecetas() {
         console.error("Error Request setup:", error.message);
         setError("Error de conexión o configuración al eliminar la receta");
       }
-    }        
+    }
     console.log("Eliminando receta:", recetaId)
-  }  
+  }
 
   const RecipeTable = ({ recipes, showActions = true, isPending = false }) => (
     <div className="overflow-x-auto">
@@ -279,7 +280,10 @@ export default function ListaRecetas() {
 
         {/* Filtros */}
         <Card>
-          <CardContent className="p-6">
+          <CardContent>
+            <CardHeader>
+              <CardTitle>Buscar Recetas</CardTitle>
+            </CardHeader>
             <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-4">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
@@ -348,11 +352,14 @@ export default function ListaRecetas() {
                 <CardHeader>
                   <CardTitle>Recetas Publicadas</CardTitle>
                   <CardDescription>Recetas que están actualmente visibles para los usuarios</CardDescription>
+                  <CardDescription>
+                    Mostrando { filterRecipes(recetasPublicadas).length } de {recetasPublicadas.length} recetas
+                  </CardDescription>
                 </CardHeader>
                 <CardContent>
                   {filterRecipes(recetasPublicadas).length === 0 && !isLoading ? (
                     <div className="text-center py-12">
-                      <h3 className="text-lg font-medium text-gray-900 mb-2">No se encontraron recetas publicadas</h3>                    
+                      <h3 className="text-lg font-medium text-gray-900 mb-2">No se encontraron recetas publicadas</h3>
                       <p className="text-gray-600">Intenta cambiar el filtro de búsqueda</p>
                     </div>
                   ) : (
@@ -367,11 +374,14 @@ export default function ListaRecetas() {
                 <CardHeader>
                   <CardTitle>Recetas Pendientes de Aprobación</CardTitle>
                   <CardDescription>Recetas enviadas por usuarios que requieren revisión</CardDescription>
+                  <CardDescription>
+                    Mostrando { filterRecipes(recetasPendientes).length } de {recetasPendientes.length} recetas
+                  </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  {filterRecipes(recetasPendientes).length === 0  && !isLoading ? (
+                  {filterRecipes(recetasPendientes).length === 0 && !isLoading ? (
                     <div className="text-center py-12">
-                      <h3 className="text-lg font-medium text-gray-900 mb-2">No se encontraron recetas pendientes</h3>                    
+                      <h3 className="text-lg font-medium text-gray-900 mb-2">No se encontraron recetas pendientes</h3>
                       {/* <p className="text-gray-600">Intenta cambiar el filtro de búsqueda</p> */}
                     </div>
                   ) : (
