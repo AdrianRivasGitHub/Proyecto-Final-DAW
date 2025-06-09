@@ -1,3 +1,4 @@
+import { React, useState, useEffect } from "react"
 import { Link } from "react-router-dom"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -5,113 +6,207 @@ import { Button } from "@/components/ui/button"
 import { Users, BookOpen, Utensils, AlertCircle, CheckCircle } from "lucide-react"
 import AdminLayout from "@/components/admin/AdminLayout"
 import { Toaster } from "sonner" 
+import recetaService from "@/services/recetaService"
+import ingredienteService from "@/services/ingredienteService"
+import subcategoriaService from "@/services/subcategoriaService"
+import usuarioService from "@/services/usuarioService"
 
 export default function DashboardAdmin() {
+  const [recetas, setRecetas] = useState([]);
+  const [usuarios, setUsuarios] = useState([]);  
+  const [ingredientes, setIngredientes] = useState([]);  
+  const [subcategorias, setSubcategorias] = useState([]);    
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState("")  
+
+  useEffect(() => {
+    fetchRecetas();
+    fetchUsuarios();
+    fetchIngredientes();
+    fetchSubcategorias();
+  }, []);
+
+  const fetchRecetas = async () => {
+    setIsLoading(true);
+    try {
+      const response = await recetaService.getRecetas();
+      setRecetas(response.data);
+      console.log(response.data);
+    } catch (error) {
+      console.error('Error al obtener las recetas', error);
+      setError("Error de conexión");
+    } finally {
+      setIsLoading(false)
+    }
+  }  
+
+  const fetchUsuarios = async () => {
+    setIsLoading(true);
+    try {
+      const response = await usuarioService.getUsuarios();
+      setUsuarios(response.data);
+      console.log(response.data);
+    } catch (error) {
+      console.error('Error al obtener los usuarios', error);
+      setError("Error de conexión");
+    } finally {
+      setIsLoading(false)
+    }    
+  }  
+
+  const fetchIngredientes = async () => {
+    setIsLoading(true);
+    try {
+      const response = await ingredienteService.getIngredientes();
+      setIngredientes(response.data);
+      console.log(response.data);
+    } catch (error) {
+      console.error('Error al obtener los ingredientes', error);
+      setError("Error de conexión");
+    } finally {
+      setIsLoading(false)
+    }    
+  }  
+
+  const fetchSubcategorias = async () => {
+    setIsLoading(true);
+    try {
+      const response = await subcategoriaService.getSubcategorias();
+      setSubcategorias(response.data);
+      console.log(response.data);
+    } catch (error) {
+      console.error('Error al obtener las subcategorías', error);
+      setError("Error de conexión");
+    } finally {
+      setIsLoading(false)
+    }    
+  }    
 
   // Datos hardcodeados para las estadísticas
   const stats = [
     {
       title: "Total Usuarios",
-      value: "47",
-      change: "+12%",
-      changeType: "increase",
+      value: usuarios.length,
       icon: Users,
       color: "text-blue-600",
     },
     {
       title: "Recetas Publicadas",
-      value: "34",
-      change: "+8%",
-      changeType: "increase",
+      value: recetas.length,
       icon: BookOpen,
       color: "text-green-600",
     },
     {
-      title: "Recetas Pendientes",
-      value: "3",
-      change: "+5",
-      changeType: "increase",
-      icon: AlertCircle,
+      title: "Total Ingredientes",
+      value: ingredientes.length,
+      icon: Utensils,      
       color: "text-yellow-600",
     },
     {
-      title: "Total Ingredientes",
-      value: "56",
-      change: "+15",
-      changeType: "increase",
-      icon: Utensils,
+      title: "Total Subcategorias",
+      value: subcategorias.length,
+      icon: AlertCircle,
       color: "text-orange-600",
     },
   ]
 
-  const recetasRecientes = [
-    {
-      id: 1,
-      nombre: "Ceviche de Conchas Negras",
-      usuario: { nombre: "María González", correo: "maria@email.com" },
-      categoria: { nombre: "Entrada" },
-      region: { nombre: "Costa" },
-      created_at: "2024-01-15T10:30:00Z",
-      estado: "pendiente",
-    },
-    {
-      id: 2,
-      nombre: "Rocoto Relleno Arequipeño",
-      usuario: { nombre: "Carlos Mendoza", correo: "carlos@email.com" },
-      categoria: { nombre: "Fondo" },
-      region: { nombre: "Sierra" },
-      created_at: "2024-01-14T15:45:00Z",
-      estado: "publicada",
-    },
-    {
-      id: 3,
-      nombre: "Suspiro Limeño Tradicional",
-      usuario: { nombre: "Ana Rodríguez", correo: "ana@email.com" },
-      categoria: { nombre: "Postre" },
-      region: { nombre: "Lima" },
-      created_at: "2024-01-13T09:20:00Z",
-      estado: "publicada",
-    },
-    {
-      id: 4,
-      nombre: "Juane de Pollo Selvático",
-      usuario: { nombre: "Luis Vargas", correo: "luis@email.com" },
-      categoria: { nombre: "Dondo" },
-      region: { nombre: "Selva" },
-      created_at: "2024-01-12T14:10:00Z",
-      estado: "borrador",
-    },
-  ]
+  // const recetasRecientes = [
+  //   {
+  //     id: 1,
+  //     nombre: "Ceviche de Conchas Negras",
+  //     usuario: { nombre: "María González", correo: "maria@email.com" },
+  //     categoria: { nombre: "Entrada" },
+  //     region: { nombre: "Costa" },
+  //     created_at: "2024-01-15T10:30:00Z",
+  //     estado: "pendiente",
+  //   },
+  //   {
+  //     id: 2,
+  //     nombre: "Rocoto Relleno Arequipeño",
+  //     usuario: { nombre: "Carlos Mendoza", correo: "carlos@email.com" },
+  //     categoria: { nombre: "Fondo" },
+  //     region: { nombre: "Sierra" },
+  //     created_at: "2024-01-14T15:45:00Z",
+  //     estado: "publicada",
+  //   },
+  //   {
+  //     id: 3,
+  //     nombre: "Suspiro Limeño Tradicional",
+  //     usuario: { nombre: "Ana Rodríguez", correo: "ana@email.com" },
+  //     categoria: { nombre: "Postre" },
+  //     region: { nombre: "Lima" },
+  //     created_at: "2024-01-13T09:20:00Z",
+  //     estado: "publicada",
+  //   },
+  //   {
+  //     id: 4,
+  //     nombre: "Juane de Pollo Selvático",
+  //     usuario: { nombre: "Luis Vargas", correo: "luis@email.com" },
+  //     categoria: { nombre: "Dondo" },
+  //     region: { nombre: "Selva" },
+  //     created_at: "2024-01-12T14:10:00Z",
+  //     estado: "borrador",
+  //   },
+  // ]
 
-  const subcategoriasData = [
-    { nombre: "Tradicional", total: 234, porcentaje: 35 },
-    { nombre: "Vegano", total: 89, porcentaje: 13 },
-    { nombre: "Sopas", total: 156, porcentaje: 23 },
-    { nombre: "Ensaladas", total: 67, porcentaje: 10 },
-    { nombre: "Criolla", total: 123, porcentaje: 19 },
-  ]
-
-  const alergenosData = [
-    { nombre: "Sin Alérgenos", total: 345, porcentaje: 45 },
-    { nombre: "Gluten", total: 234, porcentaje: 30 },
-    { nombre: "Lácteos", total: 123, porcentaje: 16 },
-    { nombre: "Mariscos", total: 67, porcentaje: 9 },
-  ]
-
-  const getStatusBadge = (estado) => {
-    const statusConfig = {
-      publicada: { label: "Publicada", variant: "default", className: "bg-green-600" },
-      borrador: { label: "Borrador", variant: "secondary" },
-      pendiente: { label: "Pendiente", variant: "outline", className: "border-yellow-500 text-yellow-700" },
+  // Calcular las 5 subcategorías más usadas
+  const subcatCount = {};
+  recetas.forEach((receta) => {
+    if (Array.isArray(receta.subcategorias_receta)) {
+      receta.subcategorias_receta.forEach((sub) => {
+        const nombre = sub.subcategoria?.nombre || sub.nombre;
+        if (nombre) {
+          subcatCount[nombre] = (subcatCount[nombre] || 0) + 1;
+        }
+      });
     }
+  });
+  const totalSubcatUsos = Object.values(subcatCount).reduce((a, b) => a + b, 0);
+  const subcategoriasData = Object.entries(subcatCount)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 5)
+    .map(([nombre, total]) => ({
+      nombre,
+      total,
+      porcentaje: totalSubcatUsos ? Math.round((total / totalSubcatUsos) * 100) : 0,
+    }));
 
-    const config = statusConfig[estado]
-    return (
-      <Badge variant={config.variant} className={config.className}>
-        {config.label}
-      </Badge>
-    )
-  }
+  // Calcular los 5 ingredientes más usados
+  const ingCount = {};
+  recetas.forEach((receta) => {
+    if (Array.isArray(receta.ingredientes_receta)) {
+      receta.ingredientes_receta.forEach((ing) => {
+        const nombre = ing.ingrediente?.nombre || ing.nombre;
+        if (nombre) {
+          ingCount[nombre] = (ingCount[nombre] || 0) + 1;
+        }
+      });
+    }
+  });
+  const totalIngUsos = Object.values(ingCount).reduce((a, b) => a + b, 0);
+  const alergenosData = Object.entries(ingCount)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 5)
+    .map(([nombre, total]) => ({
+      nombre,
+      total,
+      porcentaje: totalIngUsos ? Math.round((total / totalIngUsos) * 100) : 0,
+    }));
+
+  // const getStatusBadge = (estado) => {
+  //   const statusConfig = {
+  //     publicada: { label: "Publicada", variant: "default", className: "bg-green-600" },
+  //     borrador: { label: "Borrador", variant: "secondary" },
+  //     pendiente: { label: "Pendiente", variant: "outline", className: "border-yellow-500 text-yellow-700" },
+  //   }
+
+  //   const config = statusConfig[estado]
+  //   return (
+  //     <Badge variant={config.variant} className={config.className}>
+  //       {config.label}
+  //     </Badge>
+  //   )
+  // }
 
   const formatoDate = (dateString) => {
     return new Date(dateString).toLocaleDateString("es-ES", {
@@ -153,7 +248,7 @@ export default function DashboardAdmin() {
         </div>
 
         {/* Recetas recientes */}
-        <div className="lg:col-span-2">
+        {/* <div className="lg:col-span-2">
           <Card>
             <CardHeader>
               <div className="flex items-center justify-between">
@@ -200,7 +295,7 @@ export default function DashboardAdmin() {
               </div>
             </CardContent>
           </Card>
-        </div>
+        </div> */}
 
         {/* Gráficas y Stats */}
         <div className="grid lg:grid-cols-2 gap-8">
@@ -258,11 +353,11 @@ export default function DashboardAdmin() {
             </CardContent>
           </Card>
 
-          {/* Alergenos */}
+          {/* Ingredientes */}
           <Card>
             <CardHeader>
-              <CardTitle>Recetas por Alérgenos</CardTitle>
-              <CardDescription>Distribución según alérgenos</CardDescription>
+              <CardTitle>Recetas por Ingredientes</CardTitle>
+              <CardDescription>Distribución según ingredientes</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">

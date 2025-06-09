@@ -48,7 +48,7 @@ export default function FormPlanificacion() {
               <option key={r.id_receta} value={r.id_receta}>{r.nombre}</option>
             ))}
           </select>
-          {/* Campos para día y categoría aquí */}
+          {/* Campos para día y categoría */}
         </div>
       ))}
 

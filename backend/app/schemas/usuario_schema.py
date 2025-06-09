@@ -5,7 +5,8 @@ from marshmallow import fields, validate
 class UsuarioSchema(ma.SQLAlchemySchema):
     class Meta:
         model = Usuario
-        load_instance = True  #Permite cargar directamente a un objeto Usuario
+        load_instance = True 
+        # fields = ("id_usuario", "nombre", "correo", "rol_id", "created_at")
 
     id_usuario = ma.auto_field(dump_only=True)
     nombre = ma.auto_field(
@@ -25,3 +26,6 @@ class UsuarioSchema(ma.SQLAlchemySchema):
     updated_at = fields.DateTime(dump_only=True)
 
     rol = fields.Nested('RolSchema', only=['nombre_rol'])
+
+# usuario_schema = UsuarioSchema()
+# usuarios_schema = UsuarioSchema(many=True)

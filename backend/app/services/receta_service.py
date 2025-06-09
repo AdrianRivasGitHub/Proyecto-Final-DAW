@@ -39,7 +39,10 @@ def crear_receta(data):
             region_id=int(data['region_id']),
             usuario_id=int(data['usuario_id']),
             created_at=datetime.now(timezone.utc),
-            updated_at=datetime.now(timezone.utc)
+            updated_at=datetime.now(timezone.utc),
+            dificultad=data.get('dificultad'),
+            tiempo=data.get('tiempo'),
+            rating=data.get('rating')
         )
         db.session.add(nueva_receta)
         db.session.flush()
@@ -111,6 +114,9 @@ def actualizar_receta(id_receta, data):
     receta.region_id = int(data.get('region_id', receta.region_id))
     receta.usuario_id = int(data.get('usuario_id', receta.usuario_id))
     receta.updated_at = datetime.now(timezone.utc)
+    receta.dificultad = data.get('dificultad', receta.dificultad)
+    receta.tiempo = data.get('tiempo', receta.tiempo)
+    receta.rating = data.get('rating', receta.rating)
     
     # Limpiar registros anteriores
     db.session.query(RecetaIngrediente).filter_by(receta_id=id_receta).delete()

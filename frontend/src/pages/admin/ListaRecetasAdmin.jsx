@@ -13,7 +13,7 @@ import recetaService from "@/services/recetaService"
 import categoriaService from "@/services/categoriaService"
 import regionService from "@/services/regionService"
 
-export default function ListaRecetas() {
+export default function ListaRecetasAdmin() {
   const [recetas, setRecetas] = useState([]);
   const [categorias, setCategorias] = useState([]);
   const [regiones, setRegiones] = useState([]);
@@ -139,6 +139,15 @@ export default function ListaRecetas() {
     console.log("Eliminando receta:", recetaId)
   }
 
+  const usuarioActual = (() => {
+    try {
+      const datos = localStorage.getItem('usuario');
+      return datos ? JSON.parse(datos) : null;
+    } catch {
+      return null;
+    }
+  })();
+
   const RecipeTable = ({ recipes, showActions = true, isPending = false }) => (
     <div className="overflow-x-auto">
       <table className="w-full">
@@ -154,80 +163,87 @@ export default function ListaRecetas() {
           </tr>
         </thead>
         <tbody>
-          {recipes.map((receta) => (
-            <tr key={receta.id_receta} className="border-b hover:bg-gray-50">
-              <td className="p-4">
-                <Badge variant="outline">#{receta.id_receta}</Badge>
-              </td>
-              <td className="p-4">
-                <div>
-                  <h4 className="font-medium">{receta.nombre}</h4>
-                  <p className="text-sm text-gray-600 truncate max-w-xs">{receta.descripcion}</p>
-                </div>
-              </td>
-              <td className="p-4">
-                <Badge className="bg-orange-600">
-                  <MapPin className="h-3 w-3 mr-1" />
-                  {receta.region.nombre}
-                </Badge>
-              </td>
-              <td className="p-4">
-                <Badge variant="outline">{receta.categoria.nombre}</Badge>
-              </td>
-              <td className="p-4">
-                <div className="text-sm">
-                  <div>{formatDate(receta.created_at)}</div>
-                  {receta.updated_at !== receta.created_at && (
-                    <div className="text-gray-500">Act: {formatDate(receta.updated_at)}</div>
-                  )}
-                </div>
-              </td>
-              <td className="p-4">
-                <div className="flex items-center">
-                  <User className="h-6 w-6 mr-1 text-gray-500" />
-                  <span className="text-sm">{receta.usuario.nombre}</span>
-                </div>
-              </td>
-              {showActions && (
+          {recipes.map((receta) => {
+            const esCreador = usuarioActual && receta.usuario_id === usuarioActual.id_usuario;
+            return (
+              <tr key={receta.id_receta} className="border-b hover:bg-gray-50">
                 <td className="p-4">
-                  <div className="flex items-center space-x-2">
-                    <Button size="sm" variant="outline" asChild>
-                      <Link to={`/admin/recetas/${receta.id_receta}`}>
-                        <Eye className="h-4 w-4" />
-                      </Link>
-                    </Button>
-                    <Button size="sm" variant="outline" asChild>
-                      <Link to={`/admin/recetas/${receta.id_receta}/editar`}>
-                        <Edit className="h-4 w-4" />
-                      </Link>
-                    </Button>
-                    {isPending && (
-                      <>
-                        <Button
-                          size="sm"
-                          className="bg-green-600 hover:bg-green-700"
-                          onClick={() => handleApprove(receta.id_receta)}
-                        >
-                          <CheckCircle className="h-4 w-4" />
-                        </Button>
-                        <Button size="sm" variant="destructive" onClick={() => handleReject(receta.id_receta)}>
-                          <XCircle className="h-4 w-4" />
-                        </Button>
-                      </>
-                    )}
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="text-red-600"
-                      onClick={() => handleDelete(receta.id_receta)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
+                  <Badge variant="outline">#{receta.id_receta}</Badge>
+                </td>
+                <td className="p-4">
+                  <div>
+                    <h4 className="font-medium">{receta.nombre}</h4>
+                    <p className="text-sm text-gray-600 truncate max-w-xs">{receta.descripcion}</p>
                   </div>
                 </td>
-              )}
-            </tr>
-          ))}
+                <td className="p-4">
+                  <Badge className="bg-orange-600">
+                    <MapPin className="h-3 w-3 mr-1" />
+                    {receta.region.nombre}
+                  </Badge>
+                </td>
+                <td className="p-4">
+                  <Badge variant="outline">{receta.categoria.nombre}</Badge>
+                </td>
+                <td className="p-4">
+                  <div className="text-sm">
+                    <div>{formatDate(receta.created_at)}</div>
+                    {receta.updated_at !== receta.created_at && (
+                      <div className="text-gray-500">Act: {formatDate(receta.updated_at)}</div>
+                    )}
+                  </div>
+                </td>
+                <td className="p-4">
+                  <div className="flex items-center">
+                    <User className="h-6 w-6 mr-1 text-gray-500" />
+                    <span className="text-sm">{receta.usuario.nombre}</span>
+                  </div>
+                </td>
+                {showActions && (
+                  <td className="p-4">
+                    <div className="flex items-center space-x-2">
+                      <Button size="sm" variant="outline" asChild>
+                        <Link to={`/admin/recetas/${receta.id_receta}`}>
+                          <Eye className="h-4 w-4" />
+                        </Link>
+                      </Button>
+                      {esCreador && (
+                        <>
+                          <Button size="sm" variant="outline" asChild>
+                            <Link to={`/admin/recetas/${receta.id_receta}/editar`}>
+                              <Edit className="h-4 w-4" />
+                            </Link>
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="text-red-600"
+                            onClick={() => handleDelete(receta.id_receta)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </>
+                      )}
+                      {isPending && esCreador && (
+                        <>
+                          <Button
+                            size="sm"
+                            className="bg-green-600 hover:bg-green-700"
+                            onClick={() => handleApprove(receta.id_receta)}
+                          >
+                            <CheckCircle className="h-4 w-4" />
+                          </Button>
+                          <Button size="sm" variant="destructive" onClick={() => handleReject(receta.id_receta)}>
+                            <XCircle className="h-4 w-4" />
+                          </Button>
+                        </>
+                      )}
+                    </div>
+                  </td>
+                )}
+              </tr>
+            );
+          })}
         </tbody>
       </table>
     </div>

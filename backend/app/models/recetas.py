@@ -14,6 +14,9 @@ class Receta(db.Model):
     usuario_id = db.Column(db.Integer, db.ForeignKey('usuarios.id_usuario', ondelete='SET NULL'), nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.now(timezone.utc))
     updated_at = db.Column(db.DateTime, default=datetime.now(timezone.utc), onupdate=datetime.now(timezone.utc))
+    dificultad = db.Column(db.String(20), nullable=True)
+    tiempo = db.Column(db.Integer, nullable=True)  # minutos
+    rating = db.Column(db.Float, nullable=True)
 
     # Relaciones
     categoria = db.relationship('Categoria', backref='recetas')

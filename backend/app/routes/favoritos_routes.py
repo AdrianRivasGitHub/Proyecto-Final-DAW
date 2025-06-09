@@ -7,7 +7,7 @@ from app.controllers.favorito_controller import (
 
 favoritos_bp = Blueprint('favoritos_bp', __name__)
 
-@favoritos_bp.route('/', methods=['POST'])
+@favoritos_bp.route('', methods=['POST'])
 def agregar_favorito_route():
     return agregar_favorito_controller()
 

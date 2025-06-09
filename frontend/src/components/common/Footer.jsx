@@ -1,7 +1,7 @@
 import { ChefHat } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { NOMBRE_WEB, ANO_COPYRIGHT  } from "@/constants";
+import { NOMBRE_WEB, ANO_COPYRIGHT } from "@/constants";
 
 export default function Footer() {
   return (
@@ -14,24 +14,24 @@ export default function Footer() {
               <h4 className="text-lg font-bold">{NOMBRE_WEB}</h4>
             </div>
             <p className="text-gray-400">
-              La plataforma donde puedes descubrir y compartir la gastronomía peruana.
+              La plataforma donde puedes descubrir y compartir la gastronomía.
             </p>
           </div>
           <div>
             <h5 className="font-semibold mb-4">Explorar</h5>
             <ul className="space-y-2 text-gray-400">
               <li>
-                <Link to="/explorar" className="hover:text-white">
+                <Link to="/recetas" className="hover:text-white">
                   Todas las Recetas
                 </Link>
               </li>
               <li>
-                <Link to="/categorias" className="hover:text-white">
+                <Link to="/recetas" className="hover:text-white">
                   Categorías
                 </Link>
               </li>
               <li>
-                <Link to="/regiones" className="hover:text-white">
+                <Link to="/recetas" className="hover:text-white">
                   Por Regiones
                 </Link>
               </li>
@@ -51,17 +51,12 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <Link to="/eventos" className="hover:text-white">
-                  Eventos
+                <Link to="/blog" className="hover:text-white">
+                  Novedades
                 </Link>
               </li>
-              {/* <li>
-                <Link to="/chefs" className="hover:text-white">
-                  Chefs Destacados
-                </Link>
-              </li> */}
               <li>
-                <Link to="/contacto" className="hover:text-white">
+                <Link to="/blog" className="hover:text-white">
                   Contacto
                 </Link>
               </li>
@@ -69,17 +64,22 @@ export default function Footer() {
           </div>
           <div>
             <h5 className="font-semibold mb-4">Síguenos</h5>
-            <div className="flex space-x-4">
-              <Button size="sm" variant="ghost" className="text-gray-400 hover:text-black">
-                Facebook
-              </Button>
-              <Button size="sm" variant="ghost" className="text-gray-400 hover:text-black">
-                Instagram
-              </Button>
-              <Button size="sm" variant="ghost" className="text-gray-400 hover:text-black">
-                YouTube
-              </Button>
-            </div>
+            <ul className="space-y-2 text-gray-400">
+              <li>
+                <Button size="sm" variant="ghost" className="text-gray-400 hover:text-black">
+                  Facebook
+                </Button>
+              </li>
+              <li>
+                <Button size="sm" variant="ghost" className="text-gray-400 hover:text-black">
+                  Instagram
+                </Button>
+              </li>              <li>
+                <Button size="sm" variant="ghost" className="text-gray-400 hover:text-black">
+                  Instagram
+                </Button>
+              </li>
+            </ul>
           </div>
         </div>
         <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">

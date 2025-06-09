@@ -1,11 +1,10 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import Dashboard from './pages/Dashboard';
-import FormPlanificacion from './components/FormPlanificacion';
-import CrearUsuarioPage from './pages/CrearUsuarioPage';
-import RecipesPage from './pages/RecipesPage';
-import UsuariosPage from './pages/UsuariosPage';
-import RecetasRoutes from './routes/recetasRoutes';
+// import { BrowserRouter, Routes, Route } from 'react-router-dom';
+// import Dashboard from './pages/Dashboard';
+// import FormPlanificacion from './components/FormPlanificacion';
+// import CrearUsuarioPage from './pages/CrearUsuarioPage';
+// import UsuariosPage from './pages/UsuariosPage';
+// import RecetasRoutes from './routes/recetasRoutes';
 import AppRoutes from './routes';
 
 

@@ -9,7 +9,7 @@ from app.controllers.planificacion_controller import (
 
 planificaciones_bp = Blueprint('planificaciones_bp', __name__)
 
-@planificaciones_bp.route('/', methods=['POST'])
+@planificaciones_bp.route('', methods=['POST'])
 def crear_planificacion_route():
     return crear_planificacion_controller()
 

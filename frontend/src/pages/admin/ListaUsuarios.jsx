@@ -34,7 +34,7 @@ export default function ListaUsuarios() {
     nombre: "",
     correo: "",
     rol: { nombre_rol: "Usuario" },
-    //activo: true,
+    activo: true,
   })
 
   useEffect(() => {
@@ -131,8 +131,10 @@ export default function ListaUsuarios() {
 
   const filteredUsuarios = usuarios.filter(
     (usuario) =>
-      usuario.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      usuario.correo.toLowerCase().includes(searchTerm.toLowerCase()),
+      usuario.rol && usuario.rol.nombre_rol === "Usuario" && (
+        usuario.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        usuario.correo.toLowerCase().includes(searchTerm.toLowerCase())
+      )
   )
 
   const formatDate = (dateString) => {
@@ -147,7 +149,6 @@ export default function ListaUsuarios() {
     const roleConfig = {
       Administrador: { variant: "default", className: "bg-red-600" },
       Moderador: { variant: "default", className: "bg-blue-600" },
-      Chef: { variant: "default", className: "bg-green-600" },
       Usuario: { variant: "secondary" },
     }
 
@@ -278,7 +279,7 @@ export default function ListaUsuarios() {
                     <TableHead>ID</TableHead>
                     <TableHead>Nombre</TableHead>
                     <TableHead>Email</TableHead>
-                    <TableHead>Activo</TableHead>
+                    {/* <TableHead>Activo</TableHead> */}
                     <TableHead>Fecha de creación</TableHead>
                     <TableHead className="text-center">Acciones</TableHead>
                   </TableRow>                
@@ -289,14 +290,14 @@ export default function ListaUsuarios() {
                       <TableCell>{usuario.id_usuario}</TableCell>
                       <TableCell className="font-medium">{usuario.nombre}</TableCell>
                       <TableCell>{usuario.correo || "N/A"}</TableCell>
-                      <TableCell>
+                      {/* <TableCell>
                         <Badge
                           variant={usuario.activo ? "default" : "secondary"}
                           className={usuario.activo ? "bg-green-600" : ""}
                         >
                           {usuario.activo ? "Activo" : "Inactivo"}
                         </Badge>
-                      </TableCell>
+                      </TableCell> */}
                       <TableCell>{formatDate(usuario.created_at)}</TableCell>
                       <TableCell className="text-center">
                         <div className="flex justify-center gap-2">

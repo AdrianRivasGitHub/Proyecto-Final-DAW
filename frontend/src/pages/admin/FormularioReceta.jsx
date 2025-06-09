@@ -36,6 +36,7 @@ export default function FormularioReceta() {
   const isEditing = !!id  //Convertir a booleano
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState("")
+  const [usuario, setUsuario] = useState(null);
 
   const [formData, setFormData] = useState({
     nombre: "",
@@ -47,7 +48,10 @@ export default function FormularioReceta() {
     region_id: "",
     subcategorias: [],
     ingredientes: [],
-    usuario_id:1,
+    usuario_id: "", // Se asigna correctamente al enviar
+    dificultad: "",
+    tiempo: "",
+    rating: "",
   })
 
   const [isIngredientDialogOpen, setIsIngredientDialogOpen] = useState(false)
@@ -58,20 +62,41 @@ export default function FormularioReceta() {
   const [isSaving, setIsSaving] = useState(false)
 
   useEffect(() => {
-    const cargarDatos = async () => {
-      await fetchRegiones();
-      await fetchCategorias();
-      await fetchSubcategorias();
-      await fetchIngredientes();
-      if (isEditing) {
-        // Cargar datos de la receta para editar
-        await loadRecipeData(id);
-      }
-    };
-    cargarDatos();
+    setIsLoading(false);
+    //fetchRecetas();
+    const datosUsuarioGuardados = localStorage.getItem('usuario');
+    const token = localStorage.getItem('token');    
+    if (datosUsuarioGuardados && token) {
+      setUsuario(JSON.parse(datosUsuarioGuardados));
+    }
+    fetchRegiones();
+    fetchCategorias();
+    fetchSubcategorias();
+    fetchIngredientes();
+    if (isEditing) {
+      // Cargar datos de la receta para editar
+      setIsLoading(true);
+      loadRecipeData(id)
+    }
   }, [id, isEditing])
 
   const unidades = ["gr", "kg", "ml", "l", "unidad", "taza", "cucharada", "cucharadita", "pizca", "al gusto"]
+  const dificultades = ["Fácil", "Media", "Difícil", "Experta"];
+  const tiempos = [15, 30, 45, 60];
+
+  // Funciones para obtener valores random
+  const getDificultadRandom = () => {
+    return dificultades[Math.floor(Math.random() * dificultades.length)];
+  };
+  const getTiempoRandom = () => {
+    return tiempos[Math.floor(Math.random() * tiempos.length)];
+  };
+  const getRatingRandom = () => {
+    const min = 41;
+    const max = 50;
+    const value = Math.floor(Math.random() * (max - min + 1)) + min;
+    return (value / 10).toFixed(1);
+  };
 
   const ITEMS_PER_PAGE = 8
 
@@ -110,10 +135,10 @@ export default function FormularioReceta() {
       setError(null); // Limpiar el mensaje de error
       const response = await subcategoriaService.getSubcategorias();
       setSubcategorias(response.data);
-      console.log('Respuesta de la API:', response.data);
+      console.log(response.data);
     } catch (error) {
       console.error('Error al obtener las subcategorías', error);
-      setError('No se pudieron cargar las subcategorias. Inténtalo de nuevo más tarde.');
+      setError("Error de conexión");
     } finally {
       setIsLoading(false)
     }
@@ -159,10 +184,11 @@ export default function FormularioReceta() {
           unidad: ing.unidad,
           alergeno: ing.ingrediente.alergeno
         })) : [],
-        usuario_id: recetaData.usuario_id ? recetaData.usuario_id : 1,
+        usuario_id: recetaData.usuario_id ? recetaData.usuario_id : Number(usuario.id_usuario),
+        dificultad: recetaData.dificultad || "",
+        tiempo: recetaData.tiempo ? recetaData.tiempo.toString() : "",
+        rating: recetaData.rating || "",
       });
-
-      console.log("Datos cargados:", formData);
 
     } catch (err) {
       console.error("Error al cargar los datos de la receta:", err);
@@ -272,6 +298,10 @@ export default function FormularioReceta() {
       setIsSaving(false);
       return;
     }
+    // Asignar valores random si no están definidos
+    const dificultad = formData.dificultad || getDificultadRandom();
+    const tiempo = formData.tiempo || getTiempoRandom();
+    const rating = formData.rating || getRatingRandom();
     try {
       const formDataToSend = new FormData();
       formDataToSend.append("nombre", formData.nombre);
@@ -279,9 +309,17 @@ export default function FormularioReceta() {
       formDataToSend.append("preparacion", formData.preparacion);
       formDataToSend.append("categoria_id", formData.categoria_id);
       formDataToSend.append("region_id", formData.region_id);
-      formDataToSend.append("usuario_id", formData.usuario_id);
+      // Tomar usuario_id: si es edición, mantener el original; si es creación, usar el del usuario logueado
+      if (isEditing) {
+        formDataToSend.append("usuario_id", formData.usuario_id);
+      } else {
+        formDataToSend.append("usuario_id", usuario && usuario.id_usuario ? usuario.id_usuario : "");
+      }
       formDataToSend.append("subcategorias", JSON.stringify(formData.subcategorias));
       formDataToSend.append("ingredientes", JSON.stringify(formData.ingredientes));
+      formDataToSend.append("dificultad", dificultad);
+      formDataToSend.append("tiempo", tiempo);
+      formDataToSend.append("rating", rating);
 
       if (formData.imagenFile) {
         formDataToSend.append("imagen", formData.imagenFile);
@@ -300,8 +338,6 @@ export default function FormularioReceta() {
         console.log(formDataToSend);
       }
 
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-
       if (response.status === 200 || response.status === 201) {
         setError("");
         console.log("Guardando receta:", formData)
@@ -319,6 +355,10 @@ export default function FormularioReceta() {
       }
 
       console.log("Guardando receta:", formDataToSend)
+
+      // Simulación de llamada a la API
+      await new Promise((resolve) => setTimeout(resolve, 1000))
+
       navigate("/admin/recetas")
     } catch (error) {
 
@@ -358,13 +398,15 @@ export default function FormularioReceta() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-96">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Cargando receta...</p>
+      <AdminLayout>
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-600 mx-auto mb-4"></div>
+            <p className="text-gray-600">Cargando receta...</p>
+          </div>
         </div>
-      </div>
-    )
+      </AdminLayout>
+    );
   }
 
   return (
@@ -465,6 +507,41 @@ export default function FormularioReceta() {
                             <SelectItem key={region.id_region} value={region.id_region.toString()}>
                               {region.nombre}
                             </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="dificultad" className="pb-2">Dificultad *</Label>
+                      <Select
+                        value={formData.dificultad}
+                        onValueChange={(value) => setFormData({ ...formData, dificultad: value })}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Seleccionar dificultad" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {dificultades.map((dif) => (
+                            <SelectItem key={dif} value={dif}>{dif}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label htmlFor="tiempo" className="pb-2">Tiempo (minutos) *</Label>
+                      <Select
+                        value={formData.tiempo}
+                        onValueChange={(value) => setFormData({ ...formData, tiempo: value })}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Seleccionar tiempo" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {tiempos.map((t) => (
+                            <SelectItem key={t} value={t.toString()}>{t} min</SelectItem>
                           ))}
                         </SelectContent>
                       </Select>

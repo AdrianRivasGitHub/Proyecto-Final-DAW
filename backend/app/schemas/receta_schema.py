@@ -19,6 +19,9 @@ class RecetaSchema(ma.SQLAlchemySchema):
     categoria_id = ma.auto_field(required=True)
     region_id = ma.auto_field(required=True)
     usuario_id = ma.auto_field(required=True)
+    dificultad = ma.auto_field()
+    tiempo = ma.auto_field()
+    rating = ma.auto_field()    
     created_at = fields.DateTime(dump_only=True)
     updated_at = fields.DateTime(dump_only=True)
 
@@ -36,3 +39,5 @@ class RecetaSchema(ma.SQLAlchemySchema):
     subcategorias_receta = fields.Nested('RecetaSubcategoriaSchema', many=True, dump_only=True)
     #ingredientes = fields.List(fields.Nested('RecetaIngredienteSchema'), load_only=True)
     #subcategorias = fields.List(fields.Nested('RecetaSubcategoriaSchema'), load_only=True)
+
+

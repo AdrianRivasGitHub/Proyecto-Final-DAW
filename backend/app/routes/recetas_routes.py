@@ -12,7 +12,7 @@ from app.controllers.receta_controller import (
 recetas_bp = Blueprint("recetas_bp", __name__)
 
 # Listar todas o buscar por nombre
-@recetas_bp.route('/', methods=['GET'])
+@recetas_bp.route('', methods=['GET'])
 def obtener_recetas_route():
     return obtener_recetas_controller()
 
@@ -31,7 +31,7 @@ def recetas_por_region_route(region_id):
     return listar_recetas_por_region_controller(region_id)
 
 # Crear receta
-@recetas_bp.route('/', methods=['POST'])
+@recetas_bp.route('', methods=['POST'])
 def crear_receta_route():
     return crear_receta_controller()
 

@@ -9,7 +9,7 @@ from app.controllers.subcategoria_controller import (
 
 subcategorias_bp = Blueprint('subcategorias_bp', __name__)
 
-@subcategorias_bp.route('/', methods=['GET'])
+@subcategorias_bp.route('', methods=['GET'])
 def obtener_subcategorias_route():
     return obtener_subcategorias_controller()
 
@@ -17,7 +17,7 @@ def obtener_subcategorias_route():
 def obtener_subcategoria_route(id_subcategoria):
     return obtener_subcategoria_por_id_controller(id_subcategoria)
 
-@subcategorias_bp.route('/', methods=['POST'])
+@subcategorias_bp.route('', methods=['POST'])
 def crear_subcategoria_route():
     return crear_subcategoria_controller()
 

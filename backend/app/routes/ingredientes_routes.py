@@ -9,7 +9,7 @@ from app.controllers.ingrediente_controller import (
 
 ingredientes_bp = Blueprint('ingredientes_bp', __name__)
 
-@ingredientes_bp.route('/', methods=['GET'])
+@ingredientes_bp.route('', methods=['GET'])
 def obtener_ingredientes_route():
     return listar_ingredientes_controller()
 
@@ -17,7 +17,7 @@ def obtener_ingredientes_route():
 def obtener_ingrediente_routes(id_ingrediente):
     return obtener_ingrediente_por_id_controller(id_ingrediente)
 
-@ingredientes_bp.route('/', methods=['POST'])
+@ingredientes_bp.route('', methods=['POST'])
 def crear_ingrediente_routes():
     return crear_ingrediente_controller()
 

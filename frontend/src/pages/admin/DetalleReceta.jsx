@@ -31,17 +31,9 @@ import {
   Share2,
 } from "lucide-react"
 import AdminLayout from '@/components/admin/AdminLayout'
-import categoriaService from "@/services/categoriaService"
-import regionService from "@/services/regionService"
-import subcategoriaService from "@/services/subcategoriaService"
-import ingredienteService from "@/services/ingredienteService"
 import recetaService from "@/services/recetaService"
 
 export default function DetalleReceta() {
-  const [categorias, setCategorias] = useState([]);
-  const [regiones, setRegiones] = useState([]);
-  const [subcategorias, setSubcategorias] = useState([]);
-  const [ingredientes, setIngredientes] = useState([]);  
   const { id } = useParams()
   const navigate = useNavigate()
   const [receta, setReceta] = useState(null)
@@ -53,79 +45,9 @@ export default function DetalleReceta() {
   const [error, setError] = useState("")
 
   useEffect(() => {
-    const cargarDatos = async () => {
-      await fetchRegiones();
-      await fetchCategorias();
-      await fetchSubcategorias();
-      await fetchIngredientes();
-      // if (isEditing) {
-      //   // Cargar datos de la receta para editar
-      //   await loadRecipeData(id);
-      // }
-    };    
     loadRecipeData();
-    cargarDatos();
     console.log(receta);
   }, [id])
-
-  const fetchCategorias = async () => {
-    setIsLoading(true);
-    try {
-      setError(null); // Limpiar el mensaje de error
-      const response = await categoriaService.getCategorias();
-      setCategorias(response.data);
-      console.log('Respuesta de la API:', response.data);
-    } catch (error) {
-      console.error('Error al cargar categorias:', error);
-      setError('No se pudieron cargar las cateegorias. Inténtalo de nuevo más tarde.');
-    } finally {
-      setIsLoading(false)
-    }
-  };
-
-  const fetchRegiones = async () => {
-    setIsLoading(true);
-    try {
-      setError(null); // Limpiar el mensaje de error
-      const response = await regionService.getRegiones();
-      setRegiones(response.data);
-      console.log('Respuesta de la API:', response.data);
-    } catch (error) {
-      console.error('Error al cargar regiones:', error);
-      setError('No se pudieron cargar las regiones. Inténtalo de nuevo más tarde.');
-    }
-    setIsLoading(false);
-  };
-
-  const fetchSubcategorias = async () => {
-    setIsLoading(true);
-    try {
-      setError(null); // Limpiar el mensaje de error
-      const response = await subcategoriaService.getSubcategorias();
-      setSubcategorias(response.data);
-      console.log('Respuesta de la API:', response.data);
-    } catch (error) {
-      console.error('Error al obtener las subcategorías', error);
-      setError('No se pudieron cargar las subcategorias. Inténtalo de nuevo más tarde.');
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
-  const fetchIngredientes = async () => {
-    setIsLoading(true);
-    try {
-      setError(null); // Limpiar el mensaje de error      
-      const response = await ingredienteService.getIngredientes();
-      setIngredientes(response.data);
-      console.log(response.data);
-    } catch (error) {
-      console.error('Error al obtener los ingredientes', error);
-      setError("Error de conexión");
-    } finally {
-      setIsLoading(false)
-    }
-  }
 
   const loadRecipeData = async () => {
     setIsLoading(true)
@@ -135,86 +57,25 @@ export default function DetalleReceta() {
       const recetaData = response.data;
       const apiUrlBase = import.meta.env.VITE_API_BASE_URL.replace('/api', '');
       console.log("Receta cargada:", recetaData);
-      // Simulación de carga de datos
       await new Promise((resolve) => setTimeout(resolve, 500))
 
-      // const mockReceta = {
-      //   id_receta: Number.parseInt(id),
-      //   nombre: "Ceviche de Conchas Negras",
-      //   descripcion:
-      //     "Ceviche tradicional con conchas negras frescas del norte del Perú, marinado en limón con ají limo y cebolla morada.",
-      //   preparacion:
-      //     "Lavar bien las conchas negras y extraer la carne. Cortar en trozos medianos. En un bowl, colocar la carne de conchas y cubrir completamente con jugo de limón fresco. Dejar marinar por 10-15 minutos hasta que la carne cambie de color. Mientras tanto, cortar la cebolla morada en juliana muy fina y el ají limo en brunoise. Agregar la cebolla y el ají a las conchas marinadas. Sazonar con sal y pimienta al gusto. Mezclar suavemente y dejar reposar 5 minutos más. Servir inmediatamente acompañado de camote sancochado, choclo y cancha serrana. Decorar con hojas de lechuga y culantro picado.",
-      //   imagen_url: "/placeholder.svg?height=400&width=600",
-      //   categoria: { id: 1, nombre: "Plato Principal" },
-      //   region: { id: 1, nombre: "Costa Norte" },
-      //   usuario: {
-      //     id: 2,
-      //     nombre: "María González",
-      //     correo: "maria.gonzalez@email.com",
-      //     rol: { nombre_rol: "Chef" },
-      //   },
-      //   created_at: "2024-01-15T10:30:00Z",
-      //   updated_at: "2024-01-15T10:30:00Z",
-      //   estado: "pendiente",
-      //   subcategorias_receta: [
-      //     { subcategoria: { id: 1, nombre: "Tradicional" } },
-      //     { subcategoria: { id: 7, nombre: "Picante" } },
-      //     { subcategoria: { id: 9, nombre: "Rápido" } },
-      //   ],
-      //   ingredientes_receta: [
-      //     {
-      //       id: 1,
-      //       cantidad: "500",
-      //       unidad: "gr",
-      //       ingrediente: { id: 17, nombre: "Conchas negras", alergeno: { nombre: "Mariscos" } },
-      //     },
-      //     {
-      //       id: 2,
-      //       cantidad: "8",
-      //       unidad: "unidad",
-      //       ingrediente: { id: 2, nombre: "Limón", alergeno: null },
-      //     },
-      //     {
-      //       id: 3,
-      //       cantidad: "1",
-      //       unidad: "unidad",
-      //       ingrediente: { id: 3, nombre: "Cebolla morada", alergeno: null },
-      //     },
-      //     {
-      //       id: 4,
-      //       cantidad: "2",
-      //       unidad: "unidad",
-      //       ingrediente: { id: 4, nombre: "Ají limo", alergeno: null },
-      //     },
-      //     {
-      //       id: 5,
-      //       cantidad: "2",
-      //       unidad: "unidad",
-      //       ingrediente: { id: 5, nombre: "Camote", alergeno: null },
-      //     },
-      //     {
-      //       id: 6,
-      //       cantidad: "1",
-      //       unidad: "unidad",
-      //       ingrediente: { id: 6, nombre: "Choclo", alergeno: null },
-      //     },
-      //   ],
-      //   tiempo_preparacion: "30 min",
-      //   porciones: 4,
-      //   dificultad: "Intermedio",
-      //   calorias_estimadas: 180,
-      // }
+      const tiempos = [15, 30, 45, 60];
+      const dificultades = ["Fácil", "Media", "Difícil", "Experta"];
+      const tiempoRandom = tiempos[Math.floor(Math.random() * tiempos.length)];
+      const dificultadRandom = dificultades[Math.floor(Math.random() * dificultades.length)];
 
       setReceta({
+        id_receta: recetaData.id_receta,
         nombre: recetaData.nombre || "",
         descripcion: recetaData.descripcion || "",
         preparacion: recetaData.preparacion || "",
         imagen_url: recetaData.imagen_url ? `${apiUrlBase}${recetaData.imagen_url}` : "",
         imagenFile: null, // Se resetea al cargar, el usuario debe volver a subir si quiere cambiarla
+        categoria: recetaData.categoria,
+        region: recetaData.region,
         categoria_id: recetaData.categoria_id ? recetaData.categoria_id.toString() : "",
         region_id: recetaData.region_id ? recetaData.region_id.toString() : "",
-        subcategorias: recetaData.subcategorias_receta ? recetaData.subcategorias_receta.map(sub => sub.subcategoria_id) : [],
+        subcategorias: recetaData.subcategorias_receta ? recetaData.subcategorias_receta : [],
         ingredientes: recetaData.ingredientes_receta ? recetaData.ingredientes_receta.map(ing => ({
           ingrediente_id: ing.ingrediente_id,
           nombre: ing.ingrediente.nombre,
@@ -222,9 +83,15 @@ export default function DetalleReceta() {
           unidad: ing.unidad,
           alergeno: ing.ingrediente.alergeno
         })) : [],
+        usuario: recetaData.usuario,
         usuario_id: recetaData.usuario_id ? recetaData.usuario_id : 1,
-      });      
-      //setReceta(mockReceta)
+        estado: recetaData.usuario.rol.nombre_rol === "Admin" ? "publicada" : "pendiente",
+        tiempo_preparacion: recetaData.tiempo || `${tiempoRandom} min`,
+        porciones: recetaData.porciones || 4,
+        dificultad: recetaData.dificultad || dificultadRandom,
+        created_at: recetaData.created_at,
+        updated_at: recetaData.updated_at,
+      });
     } catch (error) {
       console.error("Error cargando receta:", error)
     } finally {
@@ -245,12 +112,11 @@ export default function DetalleReceta() {
   const getStatusBadge = (estado) => {
     const statusConfig = {
       publicada: { label: "Publicada", variant: "default", className: "bg-green-600" },
-      borrador: { label: "Borrador", variant: "secondary" },
       pendiente: { label: "Pendiente", variant: "outline", className: "border-yellow-500 text-yellow-700" },
       rechazada: { label: "Rechazada", variant: "destructive" },
     }
 
-    const config = statusConfig[estado] || statusConfig.borrador
+    const config = statusConfig[estado] || statusConfig.pendiente
     return (
       <Badge variant={config.variant} className={config.className}>
         {config.label}
@@ -270,9 +136,8 @@ export default function DetalleReceta() {
 
   const getRoleBadge = (rol) => {
     const roleConfig = {
-      Administrador: { variant: "default", className: "bg-red-600" },
+      Admin: { variant: "default", className: "bg-red-600" },
       Moderador: { variant: "default", className: "bg-blue-600" },
-      Chef: { variant: "default", className: "bg-green-600" },
       Usuario: { variant: "secondary" },
     }
 
@@ -283,6 +148,15 @@ export default function DetalleReceta() {
       </Badge>
     )
   }
+
+  const usuarioActual = (() => {
+    try {
+      const datos = localStorage.getItem('usuario');
+      return datos ? JSON.parse(datos) : null;
+    } catch {
+      return null;
+    }
+  })();
 
   const handleApprove = async () => {
     try {
@@ -347,7 +221,6 @@ export default function DetalleReceta() {
   }
 
   return (
-
     <AdminLayout>
       <div className="space-y-8">
         {/* Header */}
@@ -360,7 +233,7 @@ export default function DetalleReceta() {
               </Link>
             </Button>
             <div>
-              <div className="flex items-center space-x-3 mb-2">
+              <div className="flex items-center space-x-2 mb-2">
                 <h1 className="text-3xl font-bold text-gray-900">{receta.nombre}</h1>
                 {getStatusBadge(receta.estado)}
               </div>
@@ -368,7 +241,7 @@ export default function DetalleReceta() {
             </div>
           </div>
           <div className="flex items-center space-x-2">
-            {receta.estado === "pendiente" && (
+            {/* {receta.estado === "pendiente" && (
               <>
                 <Button className="bg-green-600 hover:bg-green-700" onClick={() => setIsApprovalDialogOpen(true)}>
                   <CheckCircle className="h-4 w-4 mr-2" />
@@ -379,104 +252,42 @@ export default function DetalleReceta() {
                   Rechazar
                 </Button>
               </>
+            )} */}
+            {usuarioActual && receta.usuario_id === usuarioActual.id_usuario && (
+              <>
+                <Button variant="outline" asChild>
+                  <Link to={`/admin/recetas/${id}/editar`}>
+                    <Edit className="h-4 w-4 mr-2" />
+                    Editar
+                  </Link>
+                </Button>
+                <Button variant="outline" className="text-red-600" onClick={() => setIsDeleteDialogOpen(true)}>
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Eliminar
+                </Button>
+              </>
             )}
-            <Button variant="outline" asChild>
-              <Link to={`/admin/recetas/${id}/editar`}>
-                <Edit className="h-4 w-4 mr-2" />
-                Editar
-              </Link>
-            </Button>
-            <Button variant="outline" className="text-red-600" onClick={() => setIsDeleteDialogOpen(true)}>
-              <Trash2 className="h-4 w-4 mr-2" />
-              Eliminar
-            </Button>
           </div>
         </div>
 
         <div className="grid lg:grid-cols-3 gap-8">
-          {/* Main Content */}
-          <div className="lg:col-span-2 space-y-8">
-            {/* Imagen de la Receta */}
-            {receta.imagen_url && (
+          {/* Imagen de la Receta */}
+          {receta.imagen_url && (
+            <div className="order-1 lg:col-span-2 lg:order-none">
               <Card>
                 <CardContent>
                   <img
                     src={receta.imagen_url || "/placeholder.svg"}
                     alt={receta.nombre}
-                    className="w-full h-96 object-cover rounded-lg"
+                    className="w-full h-96 rounded-lg"
                   />
                 </CardContent>
               </Card>
-            )}
+            </div>
+          )}
 
-            {/* Descripcion */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Descripción</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-gray-700 leading-relaxed">{receta.descripcion || "Sin descripción disponible"}</p>
-              </CardContent>
-            </Card>
-
-            {/* Preparacion */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Preparación</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="prose max-w-none">
-                  <p className="text-gray-700 leading-relaxed whitespace-pre-line">
-                    {receta.preparacion || "Sin instrucciones de preparación disponibles"}
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Author Info */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Información del Autor</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center space-x-4">
-                  <Avatar className="h-16 w-16">
-                    <AvatarImage src="/placeholder.svg?height=64&width=64" />
-                    <AvatarFallback>
-                      {/* {receta.usuario.nombre
-                        .split(" ")
-                        .map((n) => n[0])
-                        .join("")} */}
-                        hola
-                    </AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <div className="flex items-center space-x-2 mb-1">
-                      {/* <h3 className="font-semibold text-lg">{receta.usuario.nombre}</h3>
-                      {getRoleBadge(receta.usuario.rol.nombre_rol)} */}
-                    </div>
-                    {/* <p className="text-gray-600">{receta.usuario.correo}</p> */}
-                    <div className="flex items-center space-x-4 text-sm text-gray-500 mt-2">
-                      <div className="flex items-center">
-                        <Calendar className="h-4 w-4 mr-1" />
-                        Creado: {formatDate(receta.created_at)}
-                      </div>
-                      {receta.updated_at !== receta.created_at && (
-                        <div className="flex items-center">
-                          <Calendar className="h-4 w-4 mr-1" />
-                          Actualizado: {formatDate(receta.updated_at)}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Sidebar */}
-          <div className="space-y-6">
-            {/* Receta Info */}
+          {/* Información de la Receta (Sidebar) */}
+          <div className="order-2 lg:col-span-1 lg:order-none space-y-6">
             <Card>
               <CardHeader>
                 <CardTitle>Información de la Receta</CardTitle>
@@ -488,20 +299,20 @@ export default function DetalleReceta() {
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-gray-600">Categoría:</span>
-                  <Badge variant="outline">{receta.categoria_id}</Badge>
+                  <Badge variant="outline">{receta.categoria.nombre}</Badge>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-gray-600">Región:</span>
                   <Badge className="bg-orange-600">
-                    <MapPin className="h-3 w-3 mr-1" />
-                    {receta.region_id}
+                    <MapPin className="h-3 w-3" />
+                    {receta.region.nombre}
                   </Badge>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-gray-600">Tiempo:</span>
                   <div className="flex items-center">
                     <Clock className="h-4 w-4 mr-1 text-gray-500" />
-                    <span>{receta.tiempo_preparacion}</span>
+                    <span>{receta.tiempo_preparacion} min</span>
                   </div>
                 </div>
                 <div className="flex items-center justify-between">
@@ -513,22 +324,26 @@ export default function DetalleReceta() {
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-gray-600">Dificultad:</span>
-                  <Badge variant="outline">{receta.dificultad}</Badge>
+                  <Badge className="text-sm" variant="secondary">{receta.dificultad}</Badge>
                 </div>
-                {receta.calorias_estimadas && (
-                  <div className="flex items-center justify-between">
-                    <span className="text-gray-600">Calorías:</span>
-                    <span className="font-semibold">{receta.calorias_estimadas} kcal</span>
-                  </div>
-                )}
               </CardContent>
             </Card>
+            <Card>
+              <CardHeader>
+                <CardTitle>Descripción</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-700 leading-relaxed">{receta.descripcion || "Sin descripción disponible"}</p>
+              </CardContent>
+            </Card>
+          </div>
 
-            {/* Ingredientes */}
+          {/* Ingredientes (Main) */}
+          <div className="order-4 lg:col-span-2 lg:order-none space-y-8">
             <Card>
               <CardHeader>
                 <CardTitle>Ingredientes ({receta.ingredientes.length})</CardTitle>
-                <CardDescription>Para 4 porciones</CardDescription>
+                <CardDescription>Para {receta.porciones} porciones</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="grid md:grid-cols-2 gap-3">
@@ -546,8 +361,23 @@ export default function DetalleReceta() {
                 </div>
               </CardContent>
             </Card>
+            {/* Preparación */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Preparación</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="prose max-w-none">
+                  <p className="text-gray-700 leading-relaxed whitespace-pre-line">
+                    {receta.preparacion || "Sin instrucciones de preparación por ahora."}
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
 
-            {/* Subcategorias */}
+          {/* Subcategorías y Autor (Sidebar) */}
+          <div className="order-6 lg:col-span-1 lg:order-none space-y-6">
             {receta.subcategorias.length > 0 && (
               <Card>
                 <CardHeader>
@@ -556,19 +386,56 @@ export default function DetalleReceta() {
                 <CardContent>
                   <div className="flex flex-wrap gap-2">
                     {receta.subcategorias.map((subReceta) => (
-                      <Badge key={subReceta.subcategoria_id} variant="secondary">
-                        {subReceta.subcategoria_id}
+                      <Badge key={subReceta.id} variant="secondary">
+                        {subReceta.subcategoria.nombre}
                       </Badge>
                     ))}
                   </div>
                 </CardContent>
               </Card>
             )}
+            <Card>
+              <CardHeader>
+                <CardTitle>Información del Autor</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center space-x-4">
+                  <Avatar className="h-16 w-16">
+                    {/* <AvatarImage src="/placeholder.svg?height=64&width=64" /> */}
+                    <AvatarFallback>
+                      {receta.usuario.nombre
+                        .split(" ")
+                        .map((n) => n[0])
+                        .join("")}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <div className="flex items-center space-x-2 mb-1">
+                      <h3 className="font-semibold text-lg">{receta.usuario.nombre}</h3>
+                      {getRoleBadge(receta.usuario.rol.nombre_rol)}
+                    </div>
+                    <p className="text-gray-600">{receta.usuario.correo}</p>
+                    <div className="flex items-center space-x-4 text-sm text-gray-500 mt-2 lg:flex-col lg:items-start lg:space-x-0 lg:space-y-0">
+                      <div className="flex items-center">
+                        <Calendar className="h-4 w-4 mr-1" />
+                        Creado: {formatDate(receta.created_at)}
+                      </div>
+                      {receta.updated_at !== receta.created_at && (
+                        <div className="flex items-center">
+                          <Calendar className="h-4 w-4 mr-1" />
+                          Actualizado: {formatDate(receta.updated_at)}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </div>
 
         {/* Aprobar-Dialog */}
-        <Dialog open={isApprovalDialogOpen} onOpenChange={setIsApprovalDialogOpen}>
+        {/* <Dialog open={isApprovalDialogOpen} onOpenChange={setIsApprovalDialogOpen}>
           <DialogContent>
             <DialogHeader>
               <DialogTitle>Aprobar Receta</DialogTitle>
@@ -585,10 +452,10 @@ export default function DetalleReceta() {
               </Button>
             </DialogFooter>
           </DialogContent>
-        </Dialog>
+        </Dialog> */}
 
         {/* Reject Dialog */}
-        <Dialog open={isRejectDialogOpen} onOpenChange={setIsRejectDialogOpen}>
+        {/* <Dialog open={isRejectDialogOpen} onOpenChange={setIsRejectDialogOpen}>
           <DialogContent>
             <DialogHeader>
               <DialogTitle>Rechazar Receta</DialogTitle>
@@ -613,7 +480,7 @@ export default function DetalleReceta() {
               </Button>
             </DialogFooter>
           </DialogContent>
-        </Dialog>
+        </Dialog> */}
 
         {/* Delete Dialog */}
         <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
@@ -636,6 +503,5 @@ export default function DetalleReceta() {
         </Dialog>
       </div>
     </AdminLayout>
-
   )
 }
