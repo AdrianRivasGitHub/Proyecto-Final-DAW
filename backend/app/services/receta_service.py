@@ -26,9 +26,9 @@ def obtener_receta_por_id(id_receta):
     return Receta.query.get(id_receta)
 
 def crear_receta(data):
-    print("DEBUG [crear_receta]: Llamando a validar_datos_receta.")
+    #print("DEBUG [crear_receta]: Llamando a validar_datos_receta.")
     validar_datos_receta(data)
-    print("DEBUG [crear_receta]: validar_datos_receta completado.")
+    #print("DEBUG [crear_receta]: validar_datos_receta completado.")
     with db.session.begin():
         nueva_receta = Receta(
             nombre=data['nombre'],
@@ -91,16 +91,16 @@ def crear_receta(data):
         try:
             db.session.bulk_save_objects(subcategorias)
         except Exception as e:
-            print("Error al guardar subcategorias:", e)
+            #print("Error al guardar subcategorias:", e)
             raise
 
     #db.session.commit()
     return nueva_receta
 
 def actualizar_receta(id_receta, data):
-    print("DEBUG [actualizar_receta]: Llamando a validar_datos_receta.")
+    #print("DEBUG [actualizar_receta]: Llamando a validar_datos_receta.")
     validar_datos_receta(data)
-    print("DEBUG [actualizar_receta]: validar_datos_receta completado.")
+    #print("DEBUG [actualizar_receta]: validar_datos_receta completado.")
 
     receta = Receta.query.get(id_receta)
     if not receta:

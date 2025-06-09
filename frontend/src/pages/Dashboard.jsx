@@ -268,7 +268,7 @@ export default function HomePage() {
       </section>
 
       {/* New Section */}
-      <section className="py-16 px-4 bg-orange-600 text-white">
+      {/* <section className="py-16 px-4 bg-orange-600 text-white">
         <div className="container mx-auto text-center">
           <h3 className="text-3xl font-bold mb-4">¿No sabes qué cocinar hoy?</h3>
           <p className="text-xl mb-8 opacity-90">
@@ -278,7 +278,7 @@ export default function HomePage() {
             <Link to="/que-cocino">Descubrir Recetas</Link>
           </Button>
         </div>
-      </section>
+      </section> */}
 
       <Footer />
     </div>

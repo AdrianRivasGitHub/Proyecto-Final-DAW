@@ -351,12 +351,12 @@ export default function ListaIngredientes() {
                         <div className="flex items-center space-x-3 mb-2">
                           <h4 className="font-medium text-lg">{ingrediente.nombre}</h4>
                           {getAlergenoBadge(ingrediente.alergeno)}
-                          <Badge
+                          {/* <Badge
                             variant={ingrediente.usado_en_recetas ? "default" : "secondary"}
                             className={ingrediente.usado_en_recetas ? "bg-green-600" : ""}
                           >
                             {ingrediente.usado_en_recetas ? "En Uso" : "Sin Usar"}
-                          </Badge>
+                          </Badge> */}
                         </div>
                         {ingrediente.descripcion && <p className="text-sm text-gray-600 mb-2">{ingrediente.descripcion}</p>}
                         <div className="flex items-center space-x-4 text-sm text-gray-600">

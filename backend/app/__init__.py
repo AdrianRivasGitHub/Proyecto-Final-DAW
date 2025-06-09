@@ -25,7 +25,11 @@ def create_app():
     ma.init_app(app)
     migrate.init_app(app, db)
     jwt.init_app(app)
-    CORS(app, origins=[app.config["FRONTEND_URL"]], supports_credentials=True)
+    #CORS(app, origins=[app.config["FRONTEND_URL"]], supports_credentials=True)
+
+    frontend_urls_str = app.config.get("FRONTEND_URL", "")
+    frontend_urls_list = [url.strip() for url in frontend_urls_str.split(',') if url.strip()] # Convertir a lista
+    CORS(app, origins=frontend_urls_list, supports_credentials=True)
 
     #Registro de rutas
     from app.routes.alergenos_routes import alergenos_bp
