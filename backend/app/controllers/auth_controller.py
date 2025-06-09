@@ -16,7 +16,8 @@ def registro_controller():
     usuario, error = registrar_usuario(nombre, correo, contraseña, rol_id)
     if error:
         return jsonify({'msg': error}), 400
-    return jsonify({'msg': 'Usuario registrado correctamente'}), 201
+    access_token = create_access_token(identity=usuario.id_usuario)
+    return jsonify({'msg': 'Usuario registrado correctamente', 'access_token': access_token, 'usuario': usuario_schema.dump(usuario)}), 201
 
 def login_controller():
     data = request.get_json()
